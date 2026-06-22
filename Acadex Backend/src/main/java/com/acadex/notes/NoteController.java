@@ -3,6 +3,8 @@ package com.acadex.notes;
 import com.acadex.common.ApiResponse;
 import com.acadex.config.JwtUtil;
 import com.acadex.model.Note;
+import com.acadex.model.NoteComment;
+import com.acadex.requestDto.commentDto;
 import com.acadex.requestDto.noteDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -61,4 +63,17 @@ public class NoteController {
         String email = jwtUtil.extractEmail(token.substring(7));
         return noteService.saveNote(id ,email);
     }
+
+//    comment on note
+    @PostMapping("/{id}/comment")
+    public ResponseEntity<ApiResponse<NoteComment>> commentOnNote(@PathVariable Long id, @RequestBody commentDto request){
+        return noteService.commentOnNote(id, request.getComment());
+    }
+
+//    delete the comment
+    @DeleteMapping("/{id}/comment/{commentId}")
+    public ResponseEntity<ApiResponse<String>> deleteComment(@PathVariable Long id, @PathVariable Long commentId){
+        return noteService.deleteComment(id, commentId);
+    }
+
 }

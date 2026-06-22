@@ -3,10 +3,7 @@ package com.acadex.notes;
 import com.acadex.auth.AuthRepository;
 import com.acadex.common.ApiResponse;
 import com.acadex.config.FileStorageService;
-import com.acadex.model.Note;
-import com.acadex.model.NoteLike;
-import com.acadex.model.NoteSave;
-import com.acadex.model.User;
+import com.acadex.model.*;
 import com.acadex.requestDto.noteDto;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +28,9 @@ public class NoteService {
 
     @Autowired
     private NoteSaveRepository noteSaveRepository;
+
+    @Autowired
+    private NoteCommentRepository noteCommentRepository;
 
 
 //    adding new notes
@@ -138,6 +138,43 @@ public class NoteService {
             noteRepository.save(note);
             return ResponseEntity.ok(ApiResponse.success("note saved","note saved successfully"));
         }
+    }
+
+
+//    comments on note
+    public ResponseEntity<ApiResponse<NoteComment>> commentOnNote(Long id, String comment){
+        Note note=noteRepository.findById(id).orElse(null);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user=authRepository.findByEmail(email).orElse(null);
+        if(note==null || user==null){
+            return ResponseEntity.ok(ApiResponse.error("Note not found"));
+        }
+        NoteComment newComment=new NoteComment();
+        newComment.setNote(note);
+        newComment.setUser(user);
+        newComment.setComment(comment);
+        noteCommentRepository.save(newComment);
+        return ResponseEntity.ok(ApiResponse.success("Commented Successfully",newComment));
+    }
+
+//    delete the comment
+    public ResponseEntity<ApiResponse<String>> deleteComment(Long id,Long commentId){
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+
+        NoteComment noteComment=noteCommentRepository.findById(commentId).orElse(null);
+        if(noteComment==null){
+            return ResponseEntity.ok(ApiResponse.error("Note comment not found"));
+        }
+
+        String commentOnwerEmail=noteComment.getUser().getEmail();
+        String noteOnwerEmail=noteComment.getNote().getUploadedBy().getEmail();
+        if(commentOnwerEmail.equals(email) || noteOnwerEmail.equals(email)){
+            noteCommentRepository.deleteById(commentId);
+            return ResponseEntity.ok(ApiResponse.success("comment deleted","comment deleted successfully"));
+        }else  {
+            return ResponseEntity.ok(ApiResponse.error("You can only delete your own comments or your notes comment"));
+        }
+
     }
 
 
