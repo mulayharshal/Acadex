@@ -1,0 +1,64 @@
+package com.acadex.notes;
+
+import com.acadex.common.ApiResponse;
+import com.acadex.config.JwtUtil;
+import com.acadex.model.Note;
+import com.acadex.requestDto.noteDto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/notes")
+public class NoteController {
+
+    @Autowired
+    NoteService noteService;
+
+    @Autowired
+    JwtUtil jwtUtil;
+
+//    new notes add
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<Note>> createNote(
+            @ModelAttribute noteDto noteDto,
+            @RequestHeader("Authorization") String token) {
+
+        String email = jwtUtil.extractEmail(token.substring(7));
+        return noteService.uploadNote(noteDto, email);
+    }
+
+//    get all notes
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<Note>>> getAllNotes(){
+        return noteService.getAllNotes();
+    }
+
+//    get one notes
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<Note>> getNoteById(@PathVariable Long id){
+        return  noteService.getNoteById(id);
+    }
+
+//    delete one note
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteNoteById(@PathVariable Long id){
+        return noteService.deleteNoteById(id);
+    }
+//    like unlike the note
+    @PostMapping("/{id}/like")
+    public ResponseEntity<ApiResponse<String>> likeNote(@PathVariable Long id,  @RequestHeader("Authorization") String token){
+        String email = jwtUtil.extractEmail(token.substring(7));
+        return noteService.likeNote(id, email);
+    }
+
+//    save unsave the notes
+    @PostMapping("/{id}/save")
+    public ResponseEntity<ApiResponse<String>> saveNote(@PathVariable Long id, @RequestHeader("Authorization") String token){
+        String email = jwtUtil.extractEmail(token.substring(7));
+        return noteService.saveNote(id ,email);
+    }
+}
