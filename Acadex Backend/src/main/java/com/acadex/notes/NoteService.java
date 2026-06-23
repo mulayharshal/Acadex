@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -37,7 +38,7 @@ public class NoteService {
     public ResponseEntity<ApiResponse<Note>> uploadNote(noteDto noteDto, String email) {
         try {
             User user = authRepository.findByEmail(email).get();
-            String filePath = fileStorageService.saveFile(noteDto.getFile());
+            String filePath = fileStorageService.saveFile(noteDto.getFile(),"notes");
 
             Note note = new Note();
             note.setTitle(noteDto.getTitle());
@@ -175,6 +176,16 @@ public class NoteService {
             return ResponseEntity.ok(ApiResponse.error("You can only delete your own comments or your notes comment"));
         }
 
+    }
+
+//    get all comment on note
+    public ResponseEntity<ApiResponse<List<NoteComment>>> getComments(Long id){
+        Note note=noteRepository.findById(id).orElse(null);
+        if(note==null){
+            return ResponseEntity.ok(ApiResponse.error("Note not found"));
+        }
+        List<NoteComment> allComments=noteCommentRepository.getAllByNote(note);
+        return ResponseEntity.ok(ApiResponse.success("All comments",allComments));
     }
 
 

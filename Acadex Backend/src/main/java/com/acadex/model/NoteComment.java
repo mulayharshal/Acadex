@@ -1,5 +1,6 @@
 package com.acadex.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -14,6 +15,7 @@ public class NoteComment {
     private Long id;
     private String comment;
     @ManyToOne
+    @JsonIgnore
     private Note note;
     @ManyToOne
     private User user;

@@ -76,4 +76,10 @@ public class NoteController {
         return noteService.deleteComment(id, commentId);
     }
 
+//    get all comments
+    @GetMapping("/{id}/comment")
+    public ResponseEntity<ApiResponse<List<NoteComment>>> getAllComments(@PathVariable Long id){
+        return noteService.getComments(id);
+    }
+
 }

@@ -12,17 +12,24 @@ import java.nio.file.Paths;
 @Service
 public class FileStorageService {
 
-    private final String uploadDir = "uploads" + File.separator + "notes" + File.separator;
+    public String saveFile(MultipartFile file, String folder)
+            throws IOException {
 
-    public String saveFile(MultipartFile file)throws IOException {
-        File di=new File(uploadDir);
-        if(!di.exists()){
-            di.mkdirs();
+        String uploadDir = "uploads" + File.separator
+                + folder + File.separator;
+
+        File dir = new File(uploadDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
-        String fileName=System.currentTimeMillis()+"."+file.getOriginalFilename();
-        Path filePath = Paths.get(uploadDir+fileName);
-        Files.copy(file.getInputStream(),filePath);
 
-        return filePath.toString();
+        String fileName = System.currentTimeMillis()
+                + "_" + file.getOriginalFilename();
+
+        Path filePath = Paths.get(uploadDir, fileName);
+
+        Files.copy(file.getInputStream(), filePath);
+
+        return "files/" + folder + "/" + fileName;
     }
 }
