@@ -18,8 +18,10 @@ public class NoteSave {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
+    @JoinColumn(name = "note_id")
     private Note note;
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
     private LocalDateTime date;

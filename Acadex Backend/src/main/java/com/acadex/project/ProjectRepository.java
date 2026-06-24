@@ -1,4 +1,4 @@
-package com.acadex.Project;
+package com.acadex.project;
 
 import com.acadex.model.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
