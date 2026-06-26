@@ -4,7 +4,7 @@ import com.acadex.auth.AuthRepository;
 import com.acadex.common.ApiResponse;
 import com.acadex.config.FileStorageService;
 import com.acadex.model.*;
-import com.acadex.requestDto.ProjectDto;
+import com.acadex.dto.ProjectDto;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import javax.xml.stream.events.Comment;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -72,6 +70,25 @@ public class ProjectService {
         }
     }
 
+//    delete the project
+    @Transactional
+    public ResponseEntity<ApiResponse<String>> deleteProject(@PathVariable Long projectId){
+        String email= SecurityContextHolder.getContext().getAuthentication().getName();
+        User user=authRepository.findByEmail(email).orElse(null);
+        Project project=projectRepository.findById(projectId).orElse(null);
+        if(project==null){
+            return ResponseEntity.ok(ApiResponse.error("Project not found"));
+        }
+        if(!project.getUploadedBy().getEmail().equals(user.getEmail())){
+            return ResponseEntity.ok(ApiResponse.error("You are not allowed to delete this project"));
+        }
+        projectLikeRepository.deleteAllByProject(project);
+        projectSaveRepository.deleteAllByProject(project);
+        projectCommentRepository.deleteAllByProject(project);
+        projectRepository.delete(project);
+        return ResponseEntity.ok(ApiResponse.success("Project deleted successfully.","Project deleted successfully"));
+    }
+
 //    get all projects
     public ResponseEntity<ApiResponse<List<Project>>> getAllProjects(){
         List<Project> projects=projectRepository.findAll();
@@ -92,8 +109,8 @@ public class ProjectService {
 //    like the project
     @Transactional
     public ResponseEntity<ApiResponse<?>>  likeProject(Long projectId){
-        String Email=SecurityContextHolder.getContext().getAuthentication().getName();
-        User user=authRepository.findByEmail(Email).orElse(null);
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        User user=authRepository.findByEmail(email).orElse(null);
         Project project=projectRepository.findById(projectId).orElse(null);
         if(user==null|| project==null){
             return ResponseEntity.ok(ApiResponse.error("User Or Project not found"));
@@ -117,8 +134,8 @@ public class ProjectService {
 //    save unsave project
     @Transactional
     public ResponseEntity<ApiResponse<?>> saveProject(Long projectId){
-        String Email=SecurityContextHolder.getContext().getAuthentication().getName();
-        User user=authRepository.findByEmail(Email).orElse(null);
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        User user=authRepository.findByEmail(email).orElse(null);
         Project project=projectRepository.findById(projectId).orElse(null);
         if(user==null|| project==null){
             return ResponseEntity.ok(ApiResponse.error("User Or Project not found"));
@@ -142,8 +159,8 @@ public class ProjectService {
 //    comment on projects
     @Transactional
     public ResponseEntity<ApiResponse<?>> commentProject(Long projectId ,String comment){
-        String Email=SecurityContextHolder.getContext().getAuthentication().getName();
-        User user=authRepository.findByEmail(Email).orElse(null);
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        User user=authRepository.findByEmail(email).orElse(null);
         Project project=projectRepository.findById(projectId).orElse(null);
         if(user==null|| project==null){
             return ResponseEntity.ok(ApiResponse.error("User Or Project not found"));
@@ -159,8 +176,8 @@ public class ProjectService {
 //    delete comment
     @Transactional
     public ResponseEntity<ApiResponse<String>> deleteCommentProject(Long projectId, Long commentId){
-        String Email=SecurityContextHolder.getContext().getAuthentication().getName();
-        User user=authRepository.findByEmail(Email).orElse(null);
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        User user=authRepository.findByEmail(email).orElse(null);
         Project project=projectRepository.findById(projectId).orElse(null);
         if(user==null|| project==null){
             return ResponseEntity.ok(ApiResponse.error("User Or Project not found"));
@@ -169,21 +186,36 @@ public class ProjectService {
         if(projectComment==null){
             return ResponseEntity.ok(ApiResponse.error("Project comment not found"));
         }
-        projectCommentRepository.delete(projectComment);
-        return ResponseEntity.ok(ApiResponse.success("Comment deleted success", "Comment deleted successfully"));
+        if(projectComment.getUser().getEmail().equals(user.getEmail()) || project.getUploadedBy().getEmail().equals(user.getEmail())){
+            projectCommentRepository.delete(projectComment);
+            return ResponseEntity.ok(ApiResponse.success("Comment deleted success", "Comment deleted successfully"));
+        }else {
+            return ResponseEntity.ok(ApiResponse.error("You are not allowed to delete"));
+        }
+
     }
 
 //    get all comments om project
     @Transactional
     public ResponseEntity<ApiResponse<List<ProjectComment>>> getAllComments( Long projectId){
-        String Email=SecurityContextHolder.getContext().getAuthentication().getName();
-        User user=authRepository.findByEmail(Email).orElse(null);
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        User user=authRepository.findByEmail(email).orElse(null);
         Project project=projectRepository.findById(projectId).orElse(null);
-        if(user==null|| project==null){
-            return ResponseEntity.ok(ApiResponse.error("User Or Project not found"));
+        if(project==null){
+            return ResponseEntity.ok(ApiResponse.error("Project not found"));
         }
         List<ProjectComment> projectComments=projectCommentRepository.getAllByProject(project);
         return ResponseEntity.ok(ApiResponse.success("Project All comments",projectComments));
+    }
+
+//    search projects
+    @Transactional
+    public ResponseEntity<ApiResponse<List<Project>>> searchProjects(String keyword){
+        if(keyword==null||keyword.isEmpty()){
+            return ResponseEntity.ok(ApiResponse.error("Keyword empty"));
+        }
+        List<Project> projects=projectRepository.searchProjects(keyword);
+        return ResponseEntity.ok(ApiResponse.success("Project searched",projects));
     }
 
 }

@@ -4,14 +4,13 @@ import com.acadex.auth.AuthRepository;
 import com.acadex.common.ApiResponse;
 import com.acadex.config.FileStorageService;
 import com.acadex.model.*;
-import com.acadex.requestDto.noteDto;
+import com.acadex.dto.noteDto;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -186,6 +185,16 @@ public class NoteService {
         }
         List<NoteComment> allComments=noteCommentRepository.getAllByNote(note);
         return ResponseEntity.ok(ApiResponse.success("All comments",allComments));
+    }
+
+//    search notes
+    @Transactional
+    public ResponseEntity<ApiResponse<List<Note>>> searchNotes(String keyword){
+        if(keyword==null || keyword.isEmpty()){
+            return ResponseEntity.ok(ApiResponse.error("Keyword not be empty"));
+        }
+        List<Note> notes=noteRepository.searchNotes(keyword);
+        return ResponseEntity.ok(ApiResponse.success("Notes found",notes));
     }
 
 

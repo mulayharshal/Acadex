@@ -3,9 +3,8 @@ package com.acadex.project;
 import com.acadex.common.ApiResponse;
 import com.acadex.model.Project;
 import com.acadex.model.ProjectComment;
-import com.acadex.model.ProjectLike;
-import com.acadex.requestDto.ProjectDto;
-import com.acadex.requestDto.commentDto;
+import com.acadex.dto.ProjectDto;
+import com.acadex.dto.commentDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +23,12 @@ public class ProjectController {
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<?>> uploadProject(@ModelAttribute ProjectDto projectDto ) {
         return projectService.uploadProject(projectDto);
+    }
+
+//    delete the project
+    @DeleteMapping("/{projectId}")
+    public ResponseEntity<ApiResponse<String>> deleteProject(@PathVariable Long projectId) {
+        return projectService.deleteProject(projectId);
     }
 
 //    get all projects
@@ -68,4 +73,9 @@ public class ProjectController {
         return  projectService.getAllComments(projectId);
     }
 
+//    search Projects
+    @GetMapping("/search/{keyword}")
+    public ResponseEntity<ApiResponse<List<Project>>> searchProjects(@PathVariable String keyword){
+        return projectService.searchProjects(keyword);
+    }
 }

@@ -9,4 +9,6 @@ import java.util.List;
 public interface ProjectCommentRepository extends JpaRepository<ProjectComment,Long> {
 
     List<ProjectComment> getAllByProject(Project project);
+
+    void deleteAllByProject(Project project);
 }

@@ -11,4 +11,6 @@ public interface ProjectSaveRepository extends JpaRepository<ProjectSave,Integer
 
     boolean existsByUserAndProject(User user, Project project);
     void deleteByUserAndProject(User user, Project project);
+
+    void deleteAllByProject(Project project);
 }

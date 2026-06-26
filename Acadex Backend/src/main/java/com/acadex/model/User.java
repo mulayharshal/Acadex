@@ -1,16 +1,12 @@
 package com.acadex.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Generated
 @Getter
 @Setter
 public class User {
@@ -18,8 +14,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @Column(unique = true)
+    private String username;
+    @Column(unique = true, nullable = false)
     private String email;
     @JsonIgnore
+    @Column(nullable = false)
     private String password;
     private String mobile;
     private String bio;

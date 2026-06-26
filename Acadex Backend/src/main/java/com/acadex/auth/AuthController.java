@@ -2,11 +2,10 @@ package com.acadex.auth;
 
 import com.acadex.common.ApiResponse;
 import com.acadex.model.User;
-import com.acadex.requestDto.loginDto;
-import com.acadex.requestDto.registerDto;
+import com.acadex.dto.loginDto;
+import com.acadex.dto.registerDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

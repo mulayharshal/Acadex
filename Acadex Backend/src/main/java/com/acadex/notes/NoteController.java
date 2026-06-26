@@ -4,8 +4,8 @@ import com.acadex.common.ApiResponse;
 import com.acadex.config.JwtUtil;
 import com.acadex.model.Note;
 import com.acadex.model.NoteComment;
-import com.acadex.requestDto.commentDto;
-import com.acadex.requestDto.noteDto;
+import com.acadex.dto.commentDto;
+import com.acadex.dto.noteDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -80,6 +80,12 @@ public class NoteController {
     @GetMapping("/{id}/comment")
     public ResponseEntity<ApiResponse<List<NoteComment>>> getAllComments(@PathVariable Long id){
         return noteService.getComments(id);
+    }
+
+//    search notes
+    @GetMapping("/search/{keyword}")
+    public ResponseEntity<ApiResponse<List<Note>>> searchNotes(@PathVariable String keyword){
+        return  noteService.searchNotes(keyword);
     }
 
 }

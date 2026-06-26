@@ -1,4 +1,4 @@
-package com.acadex.requestDto;
+package com.acadex.dto;
 
 import lombok.Data;
 
