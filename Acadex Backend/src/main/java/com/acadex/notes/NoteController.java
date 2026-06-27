@@ -83,8 +83,8 @@ public class NoteController {
     }
 
 //    search notes
-    @GetMapping("/search/{keyword}")
-    public ResponseEntity<ApiResponse<List<Note>>> searchNotes(@PathVariable String keyword){
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<Note>>> searchNotes(@RequestParam String keyword){
         return  noteService.searchNotes(keyword);
     }
 

@@ -2,6 +2,7 @@ package com.acadex.config;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -9,7 +10,8 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private String SECRET_KEY="KJHEFBHEJBSBHFSJHbdhfbdfshbdshbfbhdbjJJJJFdd";
+    @Value("${JWT_SECRET_KEY}")
+    private String SECRET_KEY;
 
     public String generateToken(String email) {
         return Jwts.builder()

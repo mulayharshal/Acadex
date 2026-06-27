@@ -1,12 +1,8 @@
 package com.acadex.dto;
 
-import lombok.Generated;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Generated
-@Getter
-@Setter
+@Data
 public class registerDto {
     private String name;
     private String email;

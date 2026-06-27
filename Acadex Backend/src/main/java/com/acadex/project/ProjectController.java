@@ -74,8 +74,8 @@ public class ProjectController {
     }
 
 //    search Projects
-    @GetMapping("/search/{keyword}")
-    public ResponseEntity<ApiResponse<List<Project>>> searchProjects(@PathVariable String keyword){
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<Project>>> searchProjects(@RequestParam String keyword){
         return projectService.searchProjects(keyword);
     }
 }

@@ -1,6 +1,5 @@
 package com.acadex.project;
 
-import com.acadex.model.Note;
 import com.acadex.model.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

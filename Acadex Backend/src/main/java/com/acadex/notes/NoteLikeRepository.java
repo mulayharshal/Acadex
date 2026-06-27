@@ -3,7 +3,6 @@ package com.acadex.notes;
 import com.acadex.model.Note;
 import com.acadex.model.NoteLike;
 import com.acadex.model.User;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
