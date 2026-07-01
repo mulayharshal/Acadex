@@ -13,6 +13,8 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String description;
     private String tags;
     private String techStack;

@@ -119,7 +119,7 @@ public class ProjectService {
             projectLikeRepository.deleteByProjectIdAndUserId(projectId,user.getId());
             project.setLikeCount(project.getLikeCount()-1);
             projectRepository.save(project);
-            return ResponseEntity.ok(ApiResponse.success("Project unliked success","like Removed"));
+            return ResponseEntity.ok(ApiResponse.success("Project unliked success",project));
         }else {
             ProjectLike projectLike=new ProjectLike();
             projectLike.setProject(project);
@@ -127,7 +127,7 @@ public class ProjectService {
             ProjectLike savedLike=projectLikeRepository.save(projectLike);
             project.setLikeCount(project.getLikeCount()+1);
             projectRepository.save(project);
-            return ResponseEntity.ok(ApiResponse.success("Project liked success",savedLike));
+            return ResponseEntity.ok(ApiResponse.success("Project liked success",project));
         }
     }
 
@@ -144,7 +144,7 @@ public class ProjectService {
             projectSaveRepository.deleteByUserAndProject(user,project);
             project.setSaveCount(project.getSaveCount()-1);
             projectRepository.save(project);
-            return ResponseEntity.ok(ApiResponse.success("Project unsaved succes","Project unsaved successfully"));
+            return ResponseEntity.ok(ApiResponse.success("Project unsaved succes",project));
         }else {
             ProjectSave projectSave=new ProjectSave();
             projectSave.setUser(user);
@@ -152,7 +152,7 @@ public class ProjectService {
             ProjectSave saved=projectSaveRepository.save(projectSave);
             project.setSaveCount(project.getSaveCount()+1);
             projectRepository.save(project);
-            return ResponseEntity.ok(ApiResponse.success("Project saved successfully",saved));
+            return ResponseEntity.ok(ApiResponse.success("Project saved successfully",project));
         }
     }
 

@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserProfileService {
     @Autowired
@@ -35,6 +37,17 @@ public class UserProfileService {
     public ResponseEntity<ApiResponse<User>> updateUserProfile(UpdateProfileDto updateProfileDto) {
         String email= SecurityContextHolder.getContext().getAuthentication().getName();
         User user= authRepository.getByEmail(email);
+
+        Optional<User> existing =authRepository.findByUsername(updateProfileDto.getUsername());
+        if(existing.isPresent() && existing.get().getId() != user.getId()) {
+            return ResponseEntity.ok(ApiResponse.error("Username is already in use"));
+        }
+        if(updateProfileDto.getMobile()==null || updateProfileDto.getMobile().length()!= 10) {
+            return ResponseEntity.ok(ApiResponse.error("Mobile number must be 10 characters"));
+        }
+        if(updateProfileDto.getName()==null && updateProfileDto.getName().equals("")) {
+            return ResponseEntity.ok(ApiResponse.error("Name cannot be empty"));
+        }
         user.setUsername(updateProfileDto.getUsername());
         user.setMobile(updateProfileDto.getMobile());
         user.setBio(updateProfileDto.getBio());

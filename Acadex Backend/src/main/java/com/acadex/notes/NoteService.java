@@ -67,6 +67,8 @@ public class NoteService {
         if(note==null){
             return ResponseEntity.ok(ApiResponse.error("Note not found"));
         }else {
+            note.setViewCount(note.getViewCount()+1);
+            noteRepository.save(note);
             return ResponseEntity.ok(ApiResponse.success("Note found", note));
         }
     }
@@ -92,7 +94,7 @@ public class NoteService {
 
 //    like the notes
     @Transactional
-    public ResponseEntity<ApiResponse<String>> likeNote(Long id,String email){
+    public ResponseEntity<ApiResponse<?>> likeNote(Long id,String email){
         User user=authRepository.findByEmail(email).orElse(null);
         Note note=noteRepository.findById(id).orElse(null);
         if (note==null || user==null){
@@ -103,7 +105,7 @@ public class NoteService {
            noteLikeRepository.deleteByNoteAndUser(note,user);
            note.setLikeCount(note.getLikeCount()-1);
            noteRepository.save(note);
-           return ResponseEntity.ok(ApiResponse.success("like removed","like deleted successfully"));
+           return ResponseEntity.ok(ApiResponse.success("like removed",note));
         }else {
             NoteLike noteLike=new NoteLike();
             noteLike.setNote(note);
@@ -111,14 +113,14 @@ public class NoteService {
             noteLikeRepository.save(noteLike);
             note.setLikeCount(note.getLikeCount()+1);
             noteRepository.save(note);
-            return ResponseEntity.ok(ApiResponse.success("like added","like added successfully"));
+            return ResponseEntity.ok(ApiResponse.success("like added",note));
         }
     }
 
 
 //  save the Note
     @Transactional
-    public ResponseEntity<ApiResponse<String>> saveNote(Long id ,String email){
+    public ResponseEntity<ApiResponse<?>> saveNote(Long id ,String email){
         User user =authRepository.findByEmail(email).orElse(null);
         Note note=noteRepository.findById(id).orElse(null);
         if (note==null || user==null){
@@ -128,7 +130,7 @@ public class NoteService {
             noteSaveRepository.deleteByNoteAndUser(note,user);
             note.setSaveCount(note.getSaveCount()-1);
             noteRepository.save(note);
-            return  ResponseEntity.ok(ApiResponse.success("note unsaved","note unsaved successfully"));
+            return  ResponseEntity.ok(ApiResponse.success("note unsaved",note));
         }else {
             NoteSave noteSave=new NoteSave();
             noteSave.setNote(note);
@@ -136,7 +138,7 @@ public class NoteService {
             noteSaveRepository.save(noteSave);
             note.setSaveCount(note.getSaveCount()+1);
             noteRepository.save(note);
-            return ResponseEntity.ok(ApiResponse.success("note saved","note saved successfully"));
+            return ResponseEntity.ok(ApiResponse.success("note saved",note));
         }
     }
 

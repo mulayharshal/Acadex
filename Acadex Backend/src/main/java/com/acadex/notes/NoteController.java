@@ -52,14 +52,14 @@ public class NoteController {
     }
 //    like unlike the note
     @PostMapping("/{id}/like")
-    public ResponseEntity<ApiResponse<String>> likeNote(@PathVariable Long id,  @RequestHeader("Authorization") String token){
+    public ResponseEntity<ApiResponse<?>> likeNote(@PathVariable Long id,  @RequestHeader("Authorization") String token){
         String email = jwtUtil.extractEmail(token.substring(7));
         return noteService.likeNote(id, email);
     }
 
 //    save unsave the notes
     @PostMapping("/{id}/save")
-    public ResponseEntity<ApiResponse<String>> saveNote(@PathVariable Long id, @RequestHeader("Authorization") String token){
+    public ResponseEntity<ApiResponse<?>> saveNote(@PathVariable Long id, @RequestHeader("Authorization") String token){
         String email = jwtUtil.extractEmail(token.substring(7));
         return noteService.saveNote(id ,email);
     }

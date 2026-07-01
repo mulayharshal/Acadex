@@ -20,5 +20,7 @@ public class User {
     @Column(nullable = false)
     private String password;
     private String mobile;
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String bio;
 }

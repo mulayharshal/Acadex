@@ -13,6 +13,8 @@ public class Note {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String description;
     private String category;
     private String tags;

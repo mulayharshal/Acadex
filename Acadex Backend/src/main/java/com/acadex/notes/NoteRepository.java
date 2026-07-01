@@ -11,7 +11,7 @@ public interface NoteRepository extends JpaRepository<Note,Long> {
 
     @Query("SELECT n FROM Note n WHERE " +
             "LOWER(n.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(n.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "n.description LIKE CONCAT('%', :keyword, '%') OR " +
             "LOWER(n.category) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(n.tags) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Note> searchNotes(@Param("keyword") String keyword);

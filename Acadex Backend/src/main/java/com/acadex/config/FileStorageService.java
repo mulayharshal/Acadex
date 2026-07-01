@@ -30,6 +30,6 @@ public class FileStorageService {
 
         Files.copy(file.getInputStream(), filePath);
 
-        return "files/" + folder + "/" + fileName;
+        return "uploads/" + folder + "/" + fileName;
     }
 }
