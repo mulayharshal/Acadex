@@ -5,6 +5,7 @@ import com.acadex.dto.ProfileDto;
 import com.acadex.dto.UpdateProfileDto;
 import com.acadex.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +23,11 @@ public class UserProfileController {
     }
 
 //    update the profile
-    @PatchMapping("/update")
-    public ResponseEntity<ApiResponse<User>>  updateUserProfile(@RequestBody UpdateProfileDto updateProfileDto) {
+@PatchMapping(
+        value = "/update",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+)
+    public ResponseEntity<ApiResponse<User>>  updateUserProfile(@ModelAttribute  UpdateProfileDto updateProfileDto) {
         return userProfileService.updateUserProfile(updateProfileDto);
     }
 }

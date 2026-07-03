@@ -2,6 +2,7 @@ package com.acadex.notes;
 
 import com.acadex.common.ApiResponse;
 import com.acadex.config.JwtUtil;
+import com.acadex.dto.UpdateNoteDto;
 import com.acadex.model.Note;
 import com.acadex.model.NoteComment;
 import com.acadex.dto.commentDto;
@@ -50,6 +51,13 @@ public class NoteController {
     public ResponseEntity<ApiResponse<String>> deleteNoteById(@PathVariable Long id){
         return noteService.deleteNoteById(id);
     }
+
+//    get my notes only
+    @GetMapping("/my")
+    public ResponseEntity<ApiResponse<List<Note>>> getMyNotes(){
+        return noteService.getMyNotes();
+    }
+
 //    like unlike the note
     @PostMapping("/{id}/like")
     public ResponseEntity<ApiResponse<?>> likeNote(@PathVariable Long id,  @RequestHeader("Authorization") String token){
@@ -88,4 +96,15 @@ public class NoteController {
         return  noteService.searchNotes(keyword);
     }
 
+//    update the notes
+    @PatchMapping("/{noteId}")
+    public ResponseEntity<ApiResponse<Note>> updateNote(@PathVariable Long noteId, @RequestBody UpdateNoteDto updateNoteDto){
+        return noteService.updateNote(noteId,updateNoteDto);
+    }
+
+//    get saved my notes
+    @GetMapping("/saved")
+    public ResponseEntity<ApiResponse<List<Note>>> getMySavedNotes(){
+        return noteService.getMySavedNotes();
+    }
 }

@@ -1,6 +1,7 @@
 package com.acadex.project;
 
 import com.acadex.common.ApiResponse;
+import com.acadex.dto.UpdateProjectDto;
 import com.acadex.model.Project;
 import com.acadex.model.ProjectComment;
 import com.acadex.dto.ProjectDto;
@@ -43,6 +44,12 @@ public class ProjectController {
         return  projectService.getProjectById(projectId);
     }
 
+//    get my projects only
+    @GetMapping("/my")
+    public ResponseEntity<ApiResponse<List<Project>>> getMyProjects(){
+        return projectService.getMyProjects();
+    }
+
 //    like the project
     @PostMapping("/{projectId}/like")
     public ResponseEntity<ApiResponse<?>> likePrject(@PathVariable Long projectId){
@@ -78,4 +85,17 @@ public class ProjectController {
     public ResponseEntity<ApiResponse<List<Project>>> searchProjects(@RequestParam String keyword){
         return projectService.searchProjects(keyword);
     }
+
+//    update the project
+    @PatchMapping("/{projectId}")
+    public ResponseEntity<ApiResponse<Project>> updateProject(@PathVariable Long projectId, @RequestBody UpdateProjectDto  updateProjectDto){
+        return projectService.updateProject(projectId,updateProjectDto);
+    }
+
+//    get my saved projects
+    @GetMapping("/saved")
+    public ResponseEntity<ApiResponse<List<Project>>> getMySavedProjects(){
+        return projectService.getMySavedProjects();
+    }
+
 }

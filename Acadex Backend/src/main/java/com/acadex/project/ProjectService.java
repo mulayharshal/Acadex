@@ -3,6 +3,7 @@ package com.acadex.project;
 import com.acadex.auth.AuthRepository;
 import com.acadex.common.ApiResponse;
 import com.acadex.config.FileStorageService;
+import com.acadex.dto.UpdateProjectDto;
 import com.acadex.model.*;
 import com.acadex.dto.ProjectDto;
 import jakarta.transaction.Transactional;
@@ -218,4 +219,66 @@ public class ProjectService {
         return ResponseEntity.ok(ApiResponse.success("Project searched",projects));
     }
 
+//    get my projects only
+    public ResponseEntity<ApiResponse<List<Project>>> getMyProjects() {
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        User user=authRepository.findByEmail(email).orElse(null);
+        if(user==null){
+            return ResponseEntity.ok(ApiResponse.error("User Or Project not found"));
+        }
+        List<Project> myProjects= projectRepository.findAllByUploadedBy(user);
+        return ResponseEntity.ok(ApiResponse.success("your Projects",myProjects));
+    }
+
+//    update project
+    public ResponseEntity<ApiResponse<Project>> updateProject(Long projectId, UpdateProjectDto updateProjectDto) {
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        User user=authRepository.findByEmail(email).orElse(null);
+        Project project=projectRepository.findById(projectId).orElse(null);
+        if(project==null){
+            return ResponseEntity.ok(ApiResponse.error("Project not found"));
+        }
+        if(user==null){
+            return ResponseEntity.ok(ApiResponse.error("User not found"));
+        }
+        if(!user.getEmail().equals(project.getUploadedBy().getEmail())){
+            return ResponseEntity.ok(ApiResponse.error("You are not allowed to update"));
+        }
+        if (updateProjectDto.getTitle() == null || updateProjectDto.getTitle().trim().isEmpty()) {
+            return ResponseEntity.ok(ApiResponse.error("Title is required"));
+        }
+        if (updateProjectDto.getDescription() == null || updateProjectDto.getDescription().trim().isEmpty()) {
+            return ResponseEntity.ok(ApiResponse.error("Description is required"));
+        }
+        if(updateProjectDto.getTags() == null || updateProjectDto.getTags().trim().isEmpty()){
+            return ResponseEntity.ok(ApiResponse.error("Tags is required"));
+        }
+        if(updateProjectDto.getTechStack() == null || updateProjectDto.getTechStack().trim().isEmpty()){
+            return ResponseEntity.ok(ApiResponse.error("Tech stack is required"));
+        }
+
+        project.setTitle(updateProjectDto.getTitle().trim());
+        project.setDescription(updateProjectDto.getDescription().trim());
+        project.setTags(updateProjectDto.getTags().trim());
+        project.setTechStack(updateProjectDto.getTechStack().trim());
+        project.setLiveLink(updateProjectDto.getLiveLink() == null ? null : updateProjectDto.getLiveLink().trim());
+        project.setYoutubeLink(updateProjectDto.getYoutubeLink() == null ? null : updateProjectDto.getYoutubeLink().trim());
+        projectRepository.save(project);
+        return  ResponseEntity.ok(ApiResponse.success("Project Updated",project));
+
+    }
+
+//    get my saved projects
+    public ResponseEntity<ApiResponse<List<Project>>> getMySavedProjects() {
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        User user=authRepository.findByEmail(email).orElse(null);
+        if(user==null){
+            return ResponseEntity.ok(ApiResponse.error("User not found"));
+        }
+        List<Project> projects = projectSaveRepository.findAllByUser(user)
+                .stream()
+                .map(ProjectSave::getProject)
+                .toList();
+        return ResponseEntity.ok(ApiResponse.success("your saved Projects",projects));
+    }
 }

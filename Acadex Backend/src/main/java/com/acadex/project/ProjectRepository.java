@@ -1,6 +1,7 @@
 package com.acadex.project;
 
 import com.acadex.model.Project;
+import com.acadex.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,4 +20,5 @@ public interface ProjectRepository extends JpaRepository<Project,Long> {
             "LOWER(n.tags) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Project> searchProjects(@Param("keyword") String keyword);
 
+    List<Project> findAllByUploadedBy(User uploadedBy);
 }

@@ -10,6 +10,11 @@ export const getNoteById = async (id) => {
     return response.data;
 };
 
+export const getMyNotes = async () => {
+    const response = await api.get('/notes/my');
+    return response.data;
+};
+
 export const searchNotes = async (keyword) => {
     const response = await api.get(`/notes/search?keyword=${keyword}`);
     return response.data;
@@ -49,5 +54,15 @@ export const uploadNote = async (formData) => {
 
 export const deleteNote = async (id) => {
     const response = await api.delete(`/notes/${id}`);
+    return response.data;
+};
+
+export const updateNote = async (id, data) => {
+    const response = await api.patch(`/notes/${id}`, data);
+    return response.data;
+};
+
+export const getMySavedNotes = async () => {
+    const response = await api.get("/notes/saved");
     return response.data;
 };

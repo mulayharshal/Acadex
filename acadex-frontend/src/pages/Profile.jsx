@@ -1,28 +1,35 @@
 import { useEffect, useState } from "react";
-import { getProfile, updateProfile } from "../services/userService";
 import { motion } from "framer-motion";
-import { User, Mail, Phone, Pencil, Save, X, BadgeCheck } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+import {
+  User,
+  Mail,
+  BookOpen,
+  FolderGit2,
+  Pencil,
+  LogOut,
+  Bookmark,
+} from "lucide-react";
+
+import { useAuth } from "../context/AuthContext";
+
+import { getProfile } from "../services/userService";
+import { getMyNotes } from "../services/noteService";
+import { getMyProjects } from "../services/projectService";
 
 export default function Profile() {
-  const [profile, setProfile] = useState({
-    name: "",
-    username: "",
-    email: "",
-    mobile: "",
-    bio: "",
-  });
+  const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    name: "",
-    username: "",
-    mobile: "",
-    bio: "",
-  });
+  const { logoutUser } = useAuth();
+
+  const [profile, setProfile] = useState(null);
+
+  const [notesCount, setNotesCount] = useState(0);
+
+  const [projectsCount, setProjectsCount] = useState(0);
 
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [editing, setEditing] = useState(false);
-  const [message, setMessage] = useState("");
 
   useEffect(() => {
     loadProfile();
@@ -30,222 +37,268 @@ export default function Profile() {
 
   const loadProfile = async () => {
     try {
-      const res = await getProfile();
+      const profileRes = await getProfile();
+      const notesRes = await getMyNotes();
+      const projectsRes = await getMyProjects();
 
-      if (res.success) {
-        setProfile(res.data);
-        setForm({
-          name: res.data.name || "",
-          username: res.data.username || "",
-          mobile: res.data.mobile || "",
-          bio: res.data.bio || "",
-        });
+      if (profileRes.success) {
+        setProfile(profileRes.data);
+      }
+
+      if (notesRes.success) {
+        setNotesCount(notesRes.data.length);
+      }
+
+      if (projectsRes.success) {
+        setProjectsCount(projectsRes.data.length);
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const handleLogout = () => {
+    logoutUser();
 
-  const handleSave = async () => {
-    setSaving(true);
-    setMessage("");
-
-    try {
-      const res = await updateProfile(form);
-
-      if (res.success) {
-        setMessage("Profile Updated Successfully");
-
-        setEditing(false);
-
-        loadProfile();
-      } else {
-        setMessage(res.message);
-      }
-    } catch (err) {
-      setMessage("Something went wrong");
-    } finally {
-      setSaving(false);
-    }
+    navigate("/login");
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="h-14 w-14 rounded-full border-4 border-blue-600 border-t-transparent animate-spin"></div>
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="w-14 h-14 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
       </div>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="min-h-screen bg-slate-50 py-10 px-5"
-    >
+    <div className="min-h-screen bg-slate-50 py-10 px-5">
       <div className="max-w-5xl mx-auto">
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="h-40 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-3xl shadow-sm border overflow-hidden"
+        >
+          <div className="bg-gradient-to-r from-blue-700 to-indigo-700 h-40" />
 
-          <div className="px-10 pb-10">
-            <div className="-mt-16 flex justify-between items-end">
-              <div className="flex gap-5 items-end">
-                <div className="h-32 w-32 rounded-full border-[6px] border-white bg-white shadow-lg flex items-center justify-center">
-                  <User size={60} className="text-blue-600" />
-                </div>
+          <div className="px-10 pb-10 -mt-16">
+            {/* Avatar */}
 
-                <div className="pb-3">
-                  <h1 className="text-3xl font-bold text-slate-800">
-                    {profile.name}
-                  </h1>
-
-                  <p className="text-slate-500 mt-1">@{profile.username}</p>
-                </div>
-              </div>
-
-              {!editing ? (
-                <button
-                  onClick={() => setEditing(true)}
-                  className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-2xl hover:bg-blue-700 transition"
-                >
-                  <Pencil size={18} />
-                  Edit Profile
-                </button>
-              ) : (
-                <div className="flex gap-3">
-                  <button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="flex items-center gap-2 bg-green-600 text-white px-5 py-3 rounded-2xl hover:bg-green-700 transition"
-                  >
-                    <Save size={18} />
-
-                    {saving ? "Saving..." : "Save"}
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setEditing(false);
-
-                      setForm(profile);
-                    }}
-                    className="flex items-center gap-2 bg-slate-200 px-5 py-3 rounded-2xl"
-                  >
-                    <X size={18} />
-                    Cancel
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {message && (
-              <div className="mt-6 rounded-2xl bg-blue-50 text-blue-700 px-5 py-4 flex items-center gap-3">
-                <BadgeCheck size={20} />
-
-                {message}
+            {profile?.profileImage ? (
+              <img
+                src={`http://localhost:8080/api/v1/${profile.profileImage.replace(/\\/g, "/")}`}
+                alt="Profile"
+                className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
+              />
+            ) : (
+              <div className="w-32 h-32 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center border-4 border-white shadow-lg">
+                <span className="text-5xl font-bold text-white">
+                  {profile?.name?.charAt(0).toUpperCase()}
+                </span>
               </div>
             )}
 
-            <div className="grid md:grid-cols-2 gap-6 mt-10">
-              <div className="bg-slate-50 rounded-3xl p-6 border border-slate-200">
-                <label className="text-sm text-slate-500">Full Name</label>
+            {/* Profile Information */}
+            {/* Name & Email */}
 
-                {editing ? (
-                  <input
-                    type="text"
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                ) : (
-                  <div className="mt-2 font-semibold text-slate-800">
-                    {profile.name || "-"}
-                  </div>
-                )}
+            <div className="mt-6">
+              <h1 className="text-4xl font-bold text-slate-800">
+                {profile?.name}
+              </h1>
+
+              <div className="flex items-center gap-2 mt-3 text-slate-500">
+                <Mail size={18} />
+
+                <span>{profile?.email}</span>
               </div>
+            </div>
 
-              <div className="bg-slate-50 rounded-3xl p-6 border border-slate-200">
-                <label className="text-sm text-slate-500">Username</label>
+            <div className="mt-8 bg-slate-50 rounded-3xl border p-6">
+              <h2 className="text-xl font-bold text-slate-800 mb-5">
+                Personal Information
+              </h2>
 
-                {editing ? (
-                  <input
-                    type="text"
-                    name="username"
-                    value={form.username}
-                    onChange={handleChange}
-                    className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                ) : (
-                  <div className="mt-2 font-semibold text-slate-800">
-                    @{profile.username || "-"}
-                  </div>
-                )}
-              </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <p className="text-sm text-slate-500">Username</p>
 
-              <div className="bg-slate-50 rounded-3xl p-6 border border-slate-200">
-                <label className="text-sm text-slate-500 flex items-center gap-2">
-                  <Mail size={16} />
-                  Email
-                </label>
+                  <p className="font-semibold text-slate-800 mt-1">
+                    {profile?.username || "Not Added"}
+                  </p>
+                </div>
 
-                <div className="mt-2 font-semibold text-slate-800">
-                  {profile.email}
+                <div>
+                  <p className="text-sm text-slate-500">Mobile</p>
+
+                  <p className="font-semibold text-slate-800 mt-1">
+                    {profile?.mobile || "Not Added"}
+                  </p>
                 </div>
               </div>
 
-              <div className="bg-slate-50 rounded-3xl p-6 border border-slate-200">
-                <label className="text-sm text-slate-500 flex items-center gap-2">
-                  <Phone size={16} />
-                  Mobile
-                </label>
+              <div className="mt-6">
+                <p className="text-sm text-slate-500">Bio</p>
 
-                {editing ? (
-                  <input
-                    type="text"
-                    name="mobile"
-                    value={form.mobile}
-                    onChange={handleChange}
-                    className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                ) : (
-                  <div className="mt-2 font-semibold text-slate-800">
-                    {profile.mobile || "-"}
-                  </div>
-                )}
+                <p className="text-slate-700 mt-2 leading-7">
+                  {profile?.bio || "No bio added yet."}
+                </p>
               </div>
             </div>
 
-            <div className="mt-8 bg-slate-50 rounded-3xl border border-slate-200 p-6">
-              <label className="text-sm text-slate-500">Bio</label>
+            {/* Statistics */}
 
-              {editing ? (
-                <textarea
-                  rows={5}
-                  name="bio"
-                  value={form.bio}
-                  onChange={handleChange}
-                  className="mt-3 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none resize-none focus:ring-2 focus:ring-blue-500"
-                />
-              ) : (
-                <p className="mt-3 leading-7 text-slate-700">
-                  {profile.bio || "No bio added yet."}
-                </p>
-              )}
+            <div className="grid md:grid-cols-2 gap-6 mt-10">
+              <div className="rounded-3xl bg-blue-50 border border-blue-100 p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-slate-500">Notes Uploaded</p>
+
+                    <h2 className="text-4xl font-bold text-blue-700 mt-3">
+                      {notesCount}
+                    </h2>
+                  </div>
+
+                  <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center">
+                    <BookOpen size={30} className="text-white" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-3xl bg-purple-50 border border-purple-100 p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-slate-500">Projects Uploaded</p>
+
+                    <h2 className="text-4xl font-bold text-purple-700 mt-3">
+                      {projectsCount}
+                    </h2>
+                  </div>
+
+                  <div className="w-16 h-16 rounded-2xl bg-purple-600 flex items-center justify-center">
+                    <FolderGit2 size={30} className="text-white" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+
+            <div className="mt-12">
+              <h2 className="text-2xl font-bold text-slate-800 mb-6">
+                Quick Actions
+              </h2>
+
+              <div className="grid md:grid-cols-2 gap-5">
+                <motion.div
+                  whileHover={{ y: -5 }}
+                  className="rounded-3xl border bg-white p-6 cursor-pointer shadow-sm hover:shadow-lg transition"
+                  onClick={() => navigate("/my-notes")}
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center mb-5">
+                    <BookOpen size={28} className="text-blue-600" />
+                  </div>
+
+                  <h3 className="text-xl font-bold text-slate-800">My Notes</h3>
+
+                  <p className="text-slate-500 mt-2">
+                    View, edit and manage all your uploaded notes.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ y: -5 }}
+                  className="rounded-3xl border bg-white p-6 cursor-pointer shadow-sm hover:shadow-lg transition"
+                  onClick={() => navigate("/my-projects")}
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center mb-5">
+                    <FolderGit2 size={28} className="text-purple-600" />
+                  </div>
+
+                  <h3 className="text-xl font-bold text-slate-800">
+                    My Projects
+                  </h3>
+
+                  <p className="text-slate-500 mt-2">
+                    Manage all your uploaded projects.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ y: -5 }}
+                  className="rounded-3xl border bg-white p-6 cursor-pointer shadow-sm hover:shadow-lg transition"
+                  onClick={() => navigate("/saved-notes")}
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-yellow-100 flex items-center justify-center mb-5">
+                    <Bookmark size={28} className="text-yellow-600" />
+                  </div>
+
+                  <h3 className="text-xl font-bold text-slate-800">
+                    Saved Notes
+                  </h3>
+
+                  <p className="text-slate-500 mt-2">
+                    View all your bookmarked notes.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ y: -5 }}
+                  className="rounded-3xl border bg-white p-6 cursor-pointer shadow-sm hover:shadow-lg transition"
+                  onClick={() => navigate("/saved-projects")}
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center mb-5">
+                    <Bookmark size={28} className="text-purple-600" />
+                  </div>
+
+                  <h3 className="text-xl font-bold text-slate-800">
+                    Saved Projects
+                  </h3>
+
+                  <p className="text-slate-500 mt-2">
+                    View all your bookmarked projects.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ y: -5 }}
+                  className="rounded-3xl border bg-white p-6 cursor-pointer shadow-sm hover:shadow-lg transition"
+                  onClick={() => navigate("/edit-profile")}
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center mb-5">
+                    <Pencil size={28} className="text-green-600" />
+                  </div>
+
+                  <h3 className="text-xl font-bold text-slate-800">
+                    Edit Profile
+                  </h3>
+
+                  <p className="text-slate-500 mt-2">
+                    Update your personal information.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ y: -5 }}
+                  className="rounded-3xl border bg-white p-6 cursor-pointer shadow-sm hover:shadow-lg transition"
+                  onClick={handleLogout}
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-red-100 flex items-center justify-center mb-5">
+                    <LogOut size={28} className="text-red-600" />
+                  </div>
+
+                  <h3 className="text-xl font-bold text-slate-800">Logout</h3>
+
+                  <p className="text-slate-500 mt-2">
+                    Sign out of your Acadex account.
+                  </p>
+                </motion.div>
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </motion.div>
+    </div>
   );
 }

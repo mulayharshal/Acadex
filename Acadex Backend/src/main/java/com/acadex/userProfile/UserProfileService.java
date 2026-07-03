@@ -2,6 +2,7 @@ package com.acadex.userProfile;
 
 import com.acadex.auth.AuthRepository;
 import com.acadex.common.ApiResponse;
+import com.acadex.config.FileStorageService;
 import com.acadex.dto.ProfileDto;
 import com.acadex.dto.UpdateProfileDto;
 import com.acadex.model.User;
@@ -11,12 +12,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
 public class UserProfileService {
     @Autowired
     private AuthRepository authRepository;
+    @Autowired
+    private FileStorageService fileStorageService;
 
 //    get the user profile
     @Transactional
@@ -29,30 +33,46 @@ public class UserProfileService {
         profileDto.setName(user.getName());
         profileDto.setBio(user.getBio());
         profileDto.setMobile(user.getMobile());
+        profileDto.setProfileImage(user.getProfileImage());
 
         return ResponseEntity.ok(ApiResponse.success("Your profile ",profileDto));
     }
 
 //    update the user profile
-    public ResponseEntity<ApiResponse<User>> updateUserProfile(UpdateProfileDto updateProfileDto) {
-        String email= SecurityContextHolder.getContext().getAuthentication().getName();
-        User user= authRepository.getByEmail(email);
+    public ResponseEntity<ApiResponse<User>> updateUserProfile(UpdateProfileDto updateProfileDto)  {
+        try {
+            String email= SecurityContextHolder.getContext().getAuthentication().getName();
+            User user= authRepository.getByEmail(email);
 
-        Optional<User> existing =authRepository.findByUsername(updateProfileDto.getUsername());
-        if(existing.isPresent() && existing.get().getId() != user.getId()) {
-            return ResponseEntity.ok(ApiResponse.error("Username is already in use"));
+            Optional<User> existing =authRepository.findByUsername(updateProfileDto.getUsername());
+            if(existing.isPresent() && existing.get().getId() != user.getId()) {
+                return ResponseEntity.ok(ApiResponse.error("Username is already in use"));
+            }
+            if(updateProfileDto.getMobile()==null || updateProfileDto.getMobile().length()!= 10) {
+                return ResponseEntity.ok(ApiResponse.error("Mobile number must be 10 characters"));
+            }
+            if (updateProfileDto.getName() == null || updateProfileDto.getName().trim().isEmpty()) {
+                return ResponseEntity.ok(ApiResponse.error("Name cannot be empty"));
+            }
+            if (updateProfileDto.getProfileImage() != null &&
+                    !updateProfileDto.getProfileImage().isEmpty()) {
+
+                String imagePath = fileStorageService.saveFile(
+                        updateProfileDto.getProfileImage(),
+                        "profile"
+                );
+
+                user.setProfileImage(imagePath);
+            }
+            user.setUsername(updateProfileDto.getUsername());
+            user.setMobile(updateProfileDto.getMobile());
+            user.setBio(updateProfileDto.getBio());
+            user.setName(updateProfileDto.getName());
+            authRepository.save(user);
+            return ResponseEntity.ok(ApiResponse.success("Your profile updated Success ",user));
+        }catch (Exception e){
+            return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
         }
-        if(updateProfileDto.getMobile()==null || updateProfileDto.getMobile().length()!= 10) {
-            return ResponseEntity.ok(ApiResponse.error("Mobile number must be 10 characters"));
-        }
-        if(updateProfileDto.getName()==null && updateProfileDto.getName().equals("")) {
-            return ResponseEntity.ok(ApiResponse.error("Name cannot be empty"));
-        }
-        user.setUsername(updateProfileDto.getUsername());
-        user.setMobile(updateProfileDto.getMobile());
-        user.setBio(updateProfileDto.getBio());
-        user.setName(updateProfileDto.getName());
-        authRepository.save(user);
-        return ResponseEntity.ok(ApiResponse.success("Your profile updated Success ",user));
+
     }
 }

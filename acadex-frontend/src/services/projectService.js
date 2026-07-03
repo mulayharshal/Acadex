@@ -10,6 +10,11 @@ export const getProjectById = async (id) => {
     return response.data;
 };
 
+export const getMyProjects = async () => {
+    const response = await api.get("/projects/my");
+    return response.data;
+};
+
 export const searchProjects = async (keyword) => {
     const response = await api.get(`/projects/search?keyword=${keyword}`);
     return response.data;
@@ -52,5 +57,15 @@ export const uploadProject = async (formData) => {
 
 export const deleteProject = async (id) => {
     const response = await api.delete(`/projects/${id}`);
+    return response.data;
+};
+
+export const updateProject = async (id, data) => {
+    const response = await api.patch(`/projects/${id}`, data);
+    return response.data;
+};
+
+export const getMySavedProjects = async () => {
+    const response = await api.get("/projects/saved");
     return response.data;
 };

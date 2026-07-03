@@ -6,6 +6,8 @@ import com.acadex.model.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface NoteSaveRepository extends CrudRepository<NoteSave, Long> {
 
@@ -14,4 +16,5 @@ public interface NoteSaveRepository extends CrudRepository<NoteSave, Long> {
     void deleteByIdAndUser (Long id, User user);
     void deleteAllByNote(Note note);
 
+    List<NoteSave> findAllByUser(User user);
 }

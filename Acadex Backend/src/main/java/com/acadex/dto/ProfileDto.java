@@ -9,4 +9,5 @@ public class ProfileDto {
     private String email;
     private String mobile;
     private String bio;
+    private String profileImage;
 }

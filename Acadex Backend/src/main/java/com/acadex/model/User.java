@@ -23,4 +23,5 @@ public class User {
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     private String bio;
+    private String profileImage;
 }

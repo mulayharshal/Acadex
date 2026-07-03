@@ -3,6 +3,7 @@ package com.acadex.notes;
 import com.acadex.auth.AuthRepository;
 import com.acadex.common.ApiResponse;
 import com.acadex.config.FileStorageService;
+import com.acadex.dto.UpdateNoteDto;
 import com.acadex.model.*;
 import com.acadex.dto.noteDto;
 import jakarta.transaction.Transactional;
@@ -200,4 +201,60 @@ public class NoteService {
     }
 
 
+//    get my notes only
+    public ResponseEntity<ApiResponse<List<Note>>> getMyNotes() {
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        User user=authRepository.findByEmail(email).orElse(null);
+        if(user==null){
+            return ResponseEntity.ok(ApiResponse.error("User not found"));
+        }
+        List<Note> myNotes=noteRepository.findAllByUploadedBy(user);
+        return ResponseEntity.ok(ApiResponse.success("Notes found",myNotes));
+    }
+
+//    update your notes
+    public ResponseEntity<ApiResponse<Note>> updateNote(Long noteId, UpdateNoteDto updateNoteDto) {
+        Note note=noteRepository.findById(noteId).orElse(null);
+        if(note==null){
+            return ResponseEntity.ok(ApiResponse.error("Note not found"));
+        }
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        User user=authRepository.findByEmail(email).orElse(null);
+        if(!user.getEmail().equals(note.getUploadedBy().getEmail())){
+            return ResponseEntity.ok(ApiResponse.error("You can only update your notes"));
+        }
+
+        if (updateNoteDto.getTitle() == null || updateNoteDto.getTitle().trim().isEmpty()) {
+            return ResponseEntity.ok(ApiResponse.error("Title is required"));
+        }
+
+        if (updateNoteDto.getDescription() == null || updateNoteDto.getDescription().trim().isEmpty()) {
+            return ResponseEntity.ok(ApiResponse.error("Description is required"));
+        }
+
+        if (updateNoteDto.getCategory() == null || updateNoteDto.getCategory().trim().isEmpty()) {
+            return ResponseEntity.ok(ApiResponse.error("Category is required"));
+        }
+
+        note.setTitle(updateNoteDto.getTitle());
+        note.setDescription(updateNoteDto.getDescription());
+        note.setTags(updateNoteDto.getTags());
+        note.setCategory(updateNoteDto.getCategory());
+        noteRepository.save(note);
+        return ResponseEntity.ok(ApiResponse.success("Note updated",note));
+    }
+
+//    get my saved notes
+    public ResponseEntity<ApiResponse<List<Note>>> getMySavedNotes() {
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        User user=authRepository.findByEmail(email).orElse(null);
+        if(user==null){
+            return ResponseEntity.ok(ApiResponse.error("User not found"));
+        }
+        List<Note> notes = noteSaveRepository.findAllByUser(user)
+                .stream()
+                .map(NoteSave::getNote)
+                .toList();
+        return ResponseEntity.ok(ApiResponse.success("Notes saved found",notes));
+    }
 }
