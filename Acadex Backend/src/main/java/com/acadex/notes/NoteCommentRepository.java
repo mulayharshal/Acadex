@@ -11,4 +11,6 @@ import java.util.List;
 public interface NoteCommentRepository extends JpaRepository<NoteComment, Long> {
 
     List<NoteComment> getAllByNote(Note note);
+
+    void deleteAllByNote(Note note);
 }

@@ -252,7 +252,7 @@ export default function Home() {
             </div>
 
             <button
-              onClick={() => setSelectedCategory("All")}
+              onClick={() => navigate("/notes")}
               className="text-blue-600 font-semibold hover:underline"
             >
               View All →
@@ -360,7 +360,7 @@ export default function Home() {
           </div>
 
           <button
-            onClick={() => setSelectedCategory("All")}
+            onClick={() => navigate("/projects")}
             className="text-blue-600 font-semibold hover:underline"
           >
             View All →

@@ -2,6 +2,7 @@ package com.acadex.project;
 
 import com.acadex.auth.AuthRepository;
 import com.acadex.common.ApiResponse;
+import com.acadex.config.EmailService;
 import com.acadex.config.FileStorageService;
 import com.acadex.dto.UpdateProjectDto;
 import com.acadex.model.*;
@@ -35,6 +36,9 @@ public class ProjectService {
 
     @Autowired
     private ProjectCommentRepository projectCommentRepository;
+
+    @Autowired
+    EmailService emailService;
 
 //    upload the projects
     public ResponseEntity<ApiResponse<?>> uploadProject(ProjectDto projectDto){
@@ -87,12 +91,13 @@ public class ProjectService {
         projectSaveRepository.deleteAllByProject(project);
         projectCommentRepository.deleteAllByProject(project);
         projectRepository.delete(project);
+        emailService.sendProjectDeleted(email,project.getUploadedBy().getName(),project.getTitle());
         return ResponseEntity.ok(ApiResponse.success("Project deleted successfully.","Project deleted successfully"));
     }
 
 //    get all projects
     public ResponseEntity<ApiResponse<List<Project>>> getAllProjects(){
-        List<Project> projects=projectRepository.findAll();
+        List<Project> projects=projectRepository.findAllByOrderByUploadedDateDesc();
         return ResponseEntity.ok(ApiResponse.success("Project List",projects));
     }
 
@@ -226,7 +231,7 @@ public class ProjectService {
         if(user==null){
             return ResponseEntity.ok(ApiResponse.error("User Or Project not found"));
         }
-        List<Project> myProjects= projectRepository.findAllByUploadedBy(user);
+        List<Project> myProjects= projectRepository.findAllByUploadedByOrderByUploadedDateDesc(user);
         return ResponseEntity.ok(ApiResponse.success("your Projects",myProjects));
     }
 

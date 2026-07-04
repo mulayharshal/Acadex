@@ -24,4 +24,5 @@ public class User {
     @Column(columnDefinition = "LONGTEXT")
     private String bio;
     private String profileImage;
+    private  boolean verified;
 }

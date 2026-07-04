@@ -15,28 +15,147 @@ import EditNote from "./pages/EditNote";
 import EditProject from "./pages/EditProject";
 import SavedNotes from "./pages/SavedNotes";
 import SavedProjects from "./pages/SavedProjects";
-
+import VerifyOtp from "./pages/VerifyOtp";
+import Notes from "./pages/Notes";
+import Projects from "./pages/Projects";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <Navbar />
       <Routes>
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/notes"
+          element={
+            <ProtectedRoute>
+              <Notes />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/projects"
+          element={
+            <ProtectedRoute>
+              <Projects />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/notes/:id"
+          element={
+            <ProtectedRoute>
+              <NoteDetail />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/projects/:id"
+          element={
+            <ProtectedRoute>
+              <ProjectDetail />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/upload-note"
+          element={
+            <ProtectedRoute>
+              <UploadNote />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/upload-project"
+          element={
+            <ProtectedRoute>
+              <UploadProject />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/my-notes"
+          element={
+            <ProtectedRoute>
+              <MyNotes />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/my-projects"
+          element={
+            <ProtectedRoute>
+              <MyProjects />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/edit-profile"
+          element={
+            <ProtectedRoute>
+              <EditProfile />
+            </ProtectedRoute>
+          }
+        />
+ 
+        <Route
+          path="/notes/edit/:id"
+          element={
+            <ProtectedRoute>
+              <EditNote />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/projects/edit/:id"
+          element={
+            <ProtectedRoute>
+              <EditProject />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/saved-notes"
+          element={
+            <ProtectedRoute>
+              <SavedNotes />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/saved-projects"
+          element={
+            <ProtectedRoute>
+              <SavedProjects />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/notes/:id" element={<NoteDetail />} />
-        <Route path="/projects/:id" element={<ProjectDetail />} />
-        <Route path="/upload-note" element={<UploadNote />} />
-        <Route path="/upload-project" element={<UploadProject />} />
-        <Route path="/my-notes" element={<MyNotes />} />
-        <Route path="/my-projects" element={<MyProjects />} />
-        <Route path="/edit-profile" element={<EditProfile />} />
-        <Route path="/notes/edit/:id" element={<EditNote />} />
-        <Route path="/projects/edit/:id" element={<EditProject />} />
-        <Route path="/saved-notes" element={<SavedNotes />} />
-        <Route path="/saved-projects" element={<SavedProjects />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
+        
       </Routes>
     </BrowserRouter>
   );

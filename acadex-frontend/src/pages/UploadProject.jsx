@@ -12,8 +12,10 @@ import {
 } from "lucide-react";
 
 import { uploadProject } from "../services/projectService";
+import { useNavigate } from "react-router-dom";
 
 export default function UploadProject() {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
@@ -150,6 +152,8 @@ export default function UploadProject() {
 
         setImage(null);
         setZipFile(null);
+        alert("Project uploaded successfully.");
+        navigate("/my-projects");
       } else {
         setMessage(res.message);
       }

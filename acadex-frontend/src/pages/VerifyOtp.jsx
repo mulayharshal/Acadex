@@ -1,33 +1,25 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Lock, ArrowRight } from "lucide-react";
+import { ShieldCheck, ArrowRight } from "lucide-react";
 
-import { login } from "../services/authService";
+import { verifyOtp } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 
-export default function Login() {
+export default function VerifyOtp() {
   const navigate = useNavigate();
 
+  const location = useLocation();
+
   const { loginUser } = useAuth();
+
+  const email = location.state?.email || "";
+
+  const [otp, setOtp] = useState("");
 
   const [loading, setLoading] = useState(false);
 
   const [error, setError] = useState("");
-
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,23 +29,13 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await login(form.email, form.password);
+      const res = await verifyOtp(email, otp);
 
       if (res.success) {
         loginUser(res.data);
 
         navigate("/");
       } else {
-        if (res.message === "Email is not verified. OTP resent to your email") {
-          navigate("/verify-otp", {
-            state: {
-              email: form.email,
-            },
-          });
-
-          return;
-        }
-
         setError(res.message);
       }
     } catch (err) {
@@ -65,6 +47,12 @@ export default function Login() {
     }
   };
 
+  if (!email) {
+    navigate("/register");
+
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center p-6">
       <motion.div
@@ -73,9 +61,13 @@ export default function Login() {
         className="w-full max-w-md bg-white rounded-3xl overflow-hidden shadow-xl"
       >
         <div className="bg-gradient-to-r from-blue-700 to-indigo-700 px-8 py-10">
-          <h1 className="text-4xl font-bold text-white">Welcome Back</h1>
+          <h1 className="text-4xl font-bold text-white">Verify OTP</h1>
 
-          <p className="text-blue-100 mt-2">Login to continue to Acadex.</p>
+          <p className="text-blue-100 mt-2">
+            Enter the verification code sent to
+          </p>
+
+          <p className="text-white font-semibold mt-2 break-all">{email}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
@@ -86,56 +78,27 @@ export default function Login() {
           )}
 
           <div>
-            <label className="font-semibold text-slate-700">Email</label>
+            <label className="font-semibold text-slate-700">
+              Verification Code
+            </label>
 
             <div className="mt-2 relative">
-              <Mail
+              <ShieldCheck
                 size={20}
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
               />
 
               <input
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                placeholder="Enter your email"
-                className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                type="text"
+                maxLength={6}
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Enter 6-digit OTP"
+                className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none tracking-[0.5em] text-center text-lg"
                 required
               />
             </div>
           </div>
-
-          <div>
-            <label className="font-semibold text-slate-700">Password</label>
-
-            <div className="mt-2 relative">
-              <Lock
-                size={20}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-
-              <input
-                type="password"
-                name="password"
-                value={form.password}
-                onChange={handleChange}
-                placeholder="Enter your password"
-                className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
-                required
-              />
-            </div>
-          </div>
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => navigate("/forgot-password")}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-            >
-              Forgot Password?
-            </button>
-          </div>
-
           <button
             type="submit"
             disabled={loading}
@@ -144,11 +107,11 @@ export default function Login() {
             {loading ? (
               <>
                 <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                Logging In...
+                Verifying...
               </>
             ) : (
               <>
-                Login
+                Verify OTP
                 <ArrowRight size={20} />
               </>
             )}
@@ -156,12 +119,12 @@ export default function Login() {
 
           <div className="text-center">
             <p className="text-slate-600">
-              Don't have an account?{" "}
+              Wrong email?{" "}
               <Link
                 to="/register"
                 className="font-semibold text-blue-600 hover:text-blue-700"
               >
-                Register
+                Register Again
               </Link>
             </p>
           </div>

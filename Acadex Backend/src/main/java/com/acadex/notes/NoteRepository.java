@@ -18,4 +18,8 @@ public interface NoteRepository extends JpaRepository<Note,Long> {
     List<Note> searchNotes(@Param("keyword") String keyword);
 
     List<Note> findAllByUploadedBy(User uploadedBy);
+
+    List<Note> findAllByOrderByUploadedDateDesc();
+
+    List<Note> findAllByUploadedByOrderByUploadedDateDesc(User user);
 }

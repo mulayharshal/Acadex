@@ -2,8 +2,10 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Upload, File, X, Tag, BookOpen } from "lucide-react";
 import { uploadNote } from "../services/noteService";
+import { useNavigate } from "react-router-dom";
 
 export default function UploadNote() {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
@@ -148,6 +150,8 @@ export default function UploadNote() {
         setCustomCategory("");
         setTags("");
         setFile(null);
+        alert("Note uploaded successfully.");
+        navigate("/my-notes");
       } else {
         setMessage(res.message);
       }

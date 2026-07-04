@@ -21,4 +21,7 @@ public interface ProjectRepository extends JpaRepository<Project,Long> {
     List<Project> searchProjects(@Param("keyword") String keyword);
 
     List<Project> findAllByUploadedBy(User uploadedBy);
+    List<Project> findAllByOrderByUploadedDateDesc();
+
+    List<Project> findAllByUploadedByOrderByUploadedDateDesc(User user);
 }

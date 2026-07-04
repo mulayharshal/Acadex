@@ -1,84 +1,176 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { register } from '../services/authService';
-import { useAuth } from '../context/AuthContext';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { User, Mail, Lock, ArrowRight } from "lucide-react";
+
+import { register } from "../services/authService";
 
 export default function Register() {
-    const [form, setForm] = useState({ name: '', email: '', password: '' });
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const { loginUser } = useAuth();
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+  const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
-        try {
-            const res = await register(form.name, form.email, form.password);
-            if (res.success) {
-                navigate('/login');
-            } else {
-                setError(res.message);
-            }
-        } catch (err) {
-            setError('Something went wrong');
-        } finally {
-            setLoading(false);
-        }
-    };
+  const [error, setError] = useState("");
 
-    return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-                <h2 className="text-2xl font-bold text-center mb-6 text-blue-600">Create Account</h2>
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
 
-                {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <input
-                        type="text"
-                        name="name"
-                        placeholder="Full Name"
-                        value={form.name}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        required
-                    />
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        value={form.email}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        required
-                    />
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        value={form.password}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        required
-                    />
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
-                        {loading ? 'Registering...' : 'Register'}
-                    </button>
-                </form>
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-                <p className="text-center text-sm mt-4 text-gray-600">
-                    Already have an account? <Link to="/login" className="text-blue-600 hover:underline">Login</Link>
-                </p>
-            </div>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setLoading(true);
+
+    setError("");
+
+    try {
+      const res = await register(form.name, form.email, form.password);
+
+      if (res.success) {
+        navigate("/verify-otp", {
+          state: {
+            email: form.email,
+          },
+        });
+      } else {
+        setError(res.message);
+      }
+    } catch (err) {
+      console.error(err);
+
+      setError("Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md bg-white rounded-3xl overflow-hidden shadow-xl"
+      >
+        <div className="bg-gradient-to-r from-blue-700 to-indigo-700 px-8 py-10">
+          <h1 className="text-4xl font-bold text-white">Create Account</h1>
+
+          <p className="text-blue-100 mt-2">
+            Join Acadex and start sharing knowledge.
+          </p>
         </div>
-    );
+
+        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+          {error && (
+            <div className="rounded-2xl bg-red-50 border border-red-200 text-red-600 px-4 py-3">
+              {error}
+            </div>
+          )}
+
+          <div>
+            <label className="font-semibold text-slate-700">Full Name</label>
+
+            <div className="mt-2 relative">
+              <User
+                size={20}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Enter your full name"
+                className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="font-semibold text-slate-700">Email</label>
+
+            <div className="mt-2 relative">
+              <Mail
+                size={20}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="Enter your email"
+                className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="font-semibold text-slate-700">Password</label>
+
+            <div className="mt-2 relative">
+              <Lock
+                size={20}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                required
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl py-4 font-semibold flex items-center justify-center gap-3 transition disabled:opacity-70"
+          >
+            {loading ? (
+              <>
+                <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                Creating Account...
+              </>
+            ) : (
+              <>
+                Create Account
+                <ArrowRight size={20} />
+              </>
+            )}
+          </button>
+
+          <div className="text-center pt-2">
+            <p className="text-slate-600">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="font-semibold text-blue-600 hover:text-blue-700"
+              >
+                Login
+              </Link>
+            </p>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  );
 }

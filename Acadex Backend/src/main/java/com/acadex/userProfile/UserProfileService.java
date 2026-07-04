@@ -2,6 +2,7 @@ package com.acadex.userProfile;
 
 import com.acadex.auth.AuthRepository;
 import com.acadex.common.ApiResponse;
+import com.acadex.config.EmailService;
 import com.acadex.config.FileStorageService;
 import com.acadex.dto.ProfileDto;
 import com.acadex.dto.UpdateProfileDto;
@@ -21,6 +22,10 @@ public class UserProfileService {
     private AuthRepository authRepository;
     @Autowired
     private FileStorageService fileStorageService;
+
+
+    @Autowired
+    EmailService emailService;
 
 //    get the user profile
     @Transactional
@@ -69,6 +74,7 @@ public class UserProfileService {
             user.setBio(updateProfileDto.getBio());
             user.setName(updateProfileDto.getName());
             authRepository.save(user);
+            emailService.sendProfileUpdated(user.getEmail(), user.getName());
             return ResponseEntity.ok(ApiResponse.success("Your profile updated Success ",user));
         }catch (Exception e){
             return ResponseEntity.ok(ApiResponse.error(e.getMessage()));

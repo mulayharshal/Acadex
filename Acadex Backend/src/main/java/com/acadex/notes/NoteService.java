@@ -2,6 +2,7 @@ package com.acadex.notes;
 
 import com.acadex.auth.AuthRepository;
 import com.acadex.common.ApiResponse;
+import com.acadex.config.EmailService;
 import com.acadex.config.FileStorageService;
 import com.acadex.dto.UpdateNoteDto;
 import com.acadex.model.*;
@@ -33,6 +34,9 @@ public class NoteService {
     @Autowired
     private NoteCommentRepository noteCommentRepository;
 
+    @Autowired
+    EmailService emailService;
+
 
 //    adding new notes
     public ResponseEntity<ApiResponse<Note>> uploadNote(noteDto noteDto, String email) {
@@ -58,7 +62,7 @@ public class NoteService {
 
 //    get the all notes
     public ResponseEntity<ApiResponse<List<Note>>> getAllNotes(){
-        List<Note> notes=noteRepository.findAll();
+        List<Note> notes=noteRepository.findAllByOrderByUploadedDateDesc();
         return ResponseEntity.ok(ApiResponse.success("Notes found", notes));
     }
 
@@ -89,7 +93,9 @@ public class NoteService {
 
         noteLikeRepository.deleteAllByNoteId(note.getId());
         noteSaveRepository.deleteAllByNote(note);
+        noteCommentRepository.deleteAllByNote(note);
         noteRepository.delete(note);
+        emailService.sendNoteDeleted(email,note.getUploadedBy().getName(),note.getTitle());
         return ResponseEntity.ok(ApiResponse.success("Notes deleted","notes deleted"));
     }
 
@@ -208,7 +214,7 @@ public class NoteService {
         if(user==null){
             return ResponseEntity.ok(ApiResponse.error("User not found"));
         }
-        List<Note> myNotes=noteRepository.findAllByUploadedBy(user);
+        List<Note> myNotes=noteRepository.findAllByUploadedByOrderByUploadedDateDesc(user);
         return ResponseEntity.ok(ApiResponse.success("Notes found",myNotes));
     }
 

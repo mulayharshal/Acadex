@@ -87,14 +87,14 @@ export default function Navbar() {
             </span>
           </NavLink>
 
-          <NavLink to="/" className={navClass}>
+          <NavLink to="/notes" className={navClass}>
             <span className="flex items-center gap-2">
               <BookOpen size={17} />
               Notes
             </span>
           </NavLink>
 
-          <NavLink to="/" className={navClass}>
+          <NavLink to="/projects" className={navClass}>
             <span className="flex items-center gap-2">
               <FolderGit2 size={17} />
               Projects
