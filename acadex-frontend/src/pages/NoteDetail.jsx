@@ -101,9 +101,7 @@ export default function NoteDetail() {
     }
   };
 
-  const fileUrl = note?.file
-    ? note.file.replace(/\\/g, "/")
-    : "";
+  const fileUrl = note?.file ? note.file.replace(/\\/g, "/") : "";
 
   const extension = useMemo(() => {
     if (!note?.file) return "";
@@ -248,23 +246,12 @@ export default function NoteDetail() {
               )}
 
               {isOffice && (
-                <div className="rounded-3xl border bg-slate-50 p-10 text-center">
-                  <FileText size={70} className="mx-auto text-blue-600" />
-
-                  <h3 className="text-2xl font-bold mt-6">Office Document</h3>
-
-                  <p className="text-slate-500 mt-3">
-                    Preview is not supported for this file type.
-                  </p>
-
-                  <a
-                    href={fileUrl}
-                    download
-                    className="inline-flex items-center gap-2 mt-6 bg-blue-600 text-white px-6 py-3 rounded-2xl hover:bg-blue-700 transition"
-                  >
-                    <Download size={18} />
-                    Download File
-                  </a>
+                <div className="overflow-hidden rounded-3xl border shadow">
+                  <iframe
+                    src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fileUrl)}`}
+                    title="Office Preview"
+                    className="w-full h-[800px]"
+                  />
                 </div>
               )}
 
