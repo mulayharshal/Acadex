@@ -49,7 +49,33 @@ public class NoteService {
 //            for local
 //            String filePath = fileStorageService.saveFile(noteDto.getFile(),"notes");
 //            for cloudinary
-            String filePath = cloudinaryService.uploadFile(noteDto.getFile(), "acadex/notes");
+//            String filePath = cloudinaryService.uploadFile(noteDto.getFile(), "acadex/notes");
+
+
+            String originalName = noteDto.getFile().getOriginalFilename().toLowerCase();
+
+            String filePath;
+
+            if (originalName.endsWith(".pdf")
+                    || originalName.endsWith(".jpg")
+                    || originalName.endsWith(".jpeg")
+                    || originalName.endsWith(".png")
+                    || originalName.endsWith(".webp")) {
+
+                filePath = cloudinaryService.uploadFile(
+                        noteDto.getFile(),
+                        "acadex/notes"
+                );
+
+            } else {
+
+                filePath = cloudinaryService.uploadRawFile(
+                        noteDto.getFile(),
+                        "acadex/notes"
+                );
+
+            }
+
 
             Note note = new Note();
             note.setTitle(noteDto.getTitle());
