@@ -84,8 +84,8 @@ export default function UploadProject() {
       return;
     }
 
-    if (selectedFile.size > 100 * 1024 * 1024) {
-      alert("Maximum ZIP size is 100 MB.");
+    if (selectedFile.size > 10 * 1024 * 1024) {
+      alert("Maximum ZIP size is 10 MB.");
       return;
     }
 
@@ -480,7 +480,7 @@ export default function UploadProject() {
                     </p>
 
                     <p className="text-sm text-slate-400 mt-2">
-                      Maximum Size : 100 MB
+                      Maximum Size : 10 MB
                     </p>
 
                     <label className="inline-flex mt-7 cursor-pointer">

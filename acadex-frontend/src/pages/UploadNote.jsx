@@ -89,10 +89,10 @@ export default function UploadNote() {
       return;
     }
 
-    const maxSize = 20 * 1024 * 1024;
+    const maxSize = 10 * 1024 * 1024;
 
     if (selectedFile.size > maxSize) {
-      alert("Maximum file size is 20 MB.");
+      alert("Maximum file size is 10 MB.");
       return;
     }
 
@@ -324,7 +324,7 @@ export default function UploadNote() {
                     </p>
 
                     <p className="text-sm text-slate-400 mt-2">
-                      Maximum file size: 20 MB
+                      Maximum file size: 10 MB
                     </p>
 
                     <label className="inline-flex mt-8 cursor-pointer">
