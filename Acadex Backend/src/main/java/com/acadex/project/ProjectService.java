@@ -2,6 +2,7 @@ package com.acadex.project;
 
 import com.acadex.auth.AuthRepository;
 import com.acadex.common.ApiResponse;
+import com.acadex.config.CloudinaryService;
 import com.acadex.config.EmailService;
 import com.acadex.config.FileStorageService;
 import com.acadex.dto.UpdateProjectDto;
@@ -27,6 +28,9 @@ public class ProjectService {
 
     @Autowired
     private FileStorageService fileStorageService;
+
+    @Autowired
+    CloudinaryService cloudinaryService;
 
     @Autowired
     private ProjectLikeRepository projectLikeRepository;
@@ -65,8 +69,14 @@ public class ProjectService {
             project.setTags(projectDto.getTags());
             project.setTechStack(projectDto.getTechStack());
             project.setUploadedBy(user);
-            project.setFile(fileStorageService.saveFile(projectDto.getFile(),"projects"));
-            project.setImage(fileStorageService.saveFile(projectDto.getImage(),"images"));
+
+//            for local store
+//            project.setFile(fileStorageService.saveFile(projectDto.getFile(),"projects"));
+//            project.setImage(fileStorageService.saveFile(projectDto.getImage(),"images"));
+//            for online cludnairy
+            project.setImage(cloudinaryService.uploadFile(projectDto.getImage(), "acadex/project-images"));
+            project.setFile(cloudinaryService.uploadRawFile(projectDto.getFile(), "acadex/project-files"));
+
             Project upladedProject=projectRepository.save(project);
             return ResponseEntity.ok(ApiResponse.success("Project Uploaded successfully",upladedProject));
         }catch (Exception e){

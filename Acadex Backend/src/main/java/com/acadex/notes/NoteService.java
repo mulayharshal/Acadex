@@ -2,6 +2,7 @@ package com.acadex.notes;
 
 import com.acadex.auth.AuthRepository;
 import com.acadex.common.ApiResponse;
+import com.acadex.config.CloudinaryService;
 import com.acadex.config.EmailService;
 import com.acadex.config.FileStorageService;
 import com.acadex.dto.UpdateNoteDto;
@@ -23,6 +24,9 @@ public class NoteService {
     private FileStorageService fileStorageService;
 
     @Autowired
+    private CloudinaryService cloudinaryService;
+
+    @Autowired
     private NoteRepository noteRepository;
 
     @Autowired
@@ -42,7 +46,10 @@ public class NoteService {
     public ResponseEntity<ApiResponse<Note>> uploadNote(noteDto noteDto, String email) {
         try {
             User user = authRepository.findByEmail(email).get();
-            String filePath = fileStorageService.saveFile(noteDto.getFile(),"notes");
+//            for local
+//            String filePath = fileStorageService.saveFile(noteDto.getFile(),"notes");
+//            for cloudinary
+            String filePath = cloudinaryService.uploadFile(noteDto.getFile(), "acadex/notes");
 
             Note note = new Note();
             note.setTitle(noteDto.getTitle());

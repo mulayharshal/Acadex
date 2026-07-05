@@ -79,7 +79,7 @@ export default function SavedProjects() {
               >
                 {project.image && (
                   <img
-                    src={`http://localhost:8080/api/v1/${project.image.replace(/\\/g, "/")}`}
+                    src={project.image.replace(/\\/g, "/")}
                     alt={project.title}
                     className="w-full h-56 object-cover"
                   />

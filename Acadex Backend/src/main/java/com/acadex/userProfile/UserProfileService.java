@@ -2,6 +2,7 @@ package com.acadex.userProfile;
 
 import com.acadex.auth.AuthRepository;
 import com.acadex.common.ApiResponse;
+import com.acadex.config.CloudinaryService;
 import com.acadex.config.EmailService;
 import com.acadex.config.FileStorageService;
 import com.acadex.dto.ProfileDto;
@@ -23,6 +24,8 @@ public class UserProfileService {
     @Autowired
     private FileStorageService fileStorageService;
 
+    @Autowired
+    CloudinaryService cloudinaryService;
 
     @Autowired
     EmailService emailService;
@@ -62,10 +65,10 @@ public class UserProfileService {
             if (updateProfileDto.getProfileImage() != null &&
                     !updateProfileDto.getProfileImage().isEmpty()) {
 
-                String imagePath = fileStorageService.saveFile(
-                        updateProfileDto.getProfileImage(),
-                        "profile"
-                );
+//                for local
+//                String imagePath = fileStorageService.saveFile(updateProfileDto.getProfileImage(), "profile");
+//                for online cloudinary
+                String imagePath = cloudinaryService.uploadFile(updateProfileDto.getProfileImage(), "acadex/profile-images");
 
                 user.setProfileImage(imagePath);
             }

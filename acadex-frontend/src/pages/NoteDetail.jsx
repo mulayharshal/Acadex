@@ -102,7 +102,7 @@ export default function NoteDetail() {
   };
 
   const fileUrl = note?.file
-    ? `http://localhost:8080/api/v1/${note.file.replace(/\\/g, "/")}`
+    ? note.file.replace(/\\/g, "/")
     : "";
 
   const extension = useMemo(() => {

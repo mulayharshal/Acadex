@@ -88,7 +88,7 @@ export default function Profile() {
 
             {profile?.profileImage ? (
               <img
-                src={`http://localhost:8080/api/v1/${profile.profileImage.replace(/\\/g, "/")}`}
+                src={profile.profileImage.replace(/\\/g, "/")}
                 alt="Profile"
                 className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
               />

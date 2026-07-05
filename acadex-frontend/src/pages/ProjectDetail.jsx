@@ -143,7 +143,7 @@ export default function ProjectDetail() {
             <motion.img
               whileHover={{ scale: 1.04 }}
               transition={{ duration: 0.4 }}
-              src={`http://localhost:8080/api/v1/${project.image.replace(/\\/g, "/")}`}
+              src={project.image.replace(/\\/g, "/")}
               className="w-full h-[450px] object-cover"
             />
           </div>
@@ -212,7 +212,7 @@ export default function ProjectDetail() {
               </div>
 
               <a
-                href={`http://localhost:8080/api/v1/${project.file.replace(/\\/g, "/")}`}
+                href={project.file.replace(/\\/g, "/")}
                 download
                 className="rounded-2xl bg-slate-900 text-white py-4 flex justify-center items-center gap-2 hover:bg-black transition-all duration-300"
               >

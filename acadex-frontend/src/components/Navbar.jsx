@@ -146,7 +146,7 @@ export default function Navbar() {
               >
                 {profile?.profileImage ? (
                   <img
-                    src={`http://localhost:8080/api/v1/${profile.profileImage.replace(/\\/g, "/")}`}
+                    src={profile.profileImage.replace(/\\/g, "/")}
                     alt="Profile"
                     className="w-full h-full object-cover"
                   />
