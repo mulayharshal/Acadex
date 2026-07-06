@@ -22,9 +22,18 @@ import {
   getComments,
   deleteComment,
 } from "../services/noteService";
+import { Document, Page, pdfjs } from "react-pdf";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url
+).toString();
 
 export default function NoteDetail() {
   const { id } = useParams();
+const [numPages, setNumPages] = useState(0);
+const [pageWidth, setPageWidth] = useState(900);
 
   const [note, setNote] = useState(null);
   const [comments, setComments] = useState([]);
@@ -35,6 +44,18 @@ export default function NoteDetail() {
     loadNote();
     loadComments();
   }, [id]);
+
+  useEffect(() => {
+  const updateWidth = () => {
+    setPageWidth(Math.min(window.innerWidth - 40, 900));
+  };
+
+  updateWidth();
+
+  window.addEventListener("resize", updateWidth);
+
+  return () => window.removeEventListener("resize", updateWidth);
+}, []);
 
   const loadNote = async () => {
     try {
@@ -225,16 +246,41 @@ export default function NoteDetail() {
             <div className="mt-12">
               <h2 className="text-2xl font-bold mb-6">Preview</h2>
 
-              {isPdf && (
-                <div className="overflow-hidden rounded-3xl border shadow">
-                  <iframe
-                    src={fileUrl}
-                    title="PDF Preview"
-                    className="w-full h-[800px]"
-                  />
-                </div>
-              )}
-
+{isPdf && (
+  <div className="rounded-3xl border bg-white shadow overflow-hidden">
+    <div className="h-[800px] overflow-y-auto overflow-x-hidden p-4">
+      <Document
+        file={fileUrl}
+        onLoadSuccess={({ numPages }) => {
+          setNumPages(numPages);
+        }}
+        loading={
+          <div className="text-center py-10 text-slate-500">
+            Loading PDF...
+          </div>
+        }
+        error={
+          <div className="text-center py-10 text-red-500">
+            Failed to load PDF.
+          </div>
+        }
+      >
+        <div className="space-y-6">
+          {Array.from({ length: numPages }, (_, index) => (
+            <div key={index} className="flex justify-center">
+              <Page
+                pageNumber={index + 1}
+                width={pageWidth}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
+              />
+            </div>
+          ))}
+        </div>
+      </Document>
+    </div>
+  </div>
+)}
               {isImage && (
                 <div className="overflow-hidden rounded-3xl border shadow">
                   <img
