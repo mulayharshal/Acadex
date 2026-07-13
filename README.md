@@ -12,6 +12,8 @@
 
 ### 🚀 Live Demo
 
+https://acadex-web.netlify.app/
+
 https://acadex-harshal.web.app/
 
 </div>
