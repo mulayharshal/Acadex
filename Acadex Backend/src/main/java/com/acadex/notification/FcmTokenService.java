@@ -4,6 +4,7 @@ import com.acadex.auth.AuthRepository;
 import com.acadex.dto.FcmTokenRequest;
 import com.acadex.model.FcmToken;
 import com.acadex.model.User;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,7 @@ public class FcmTokenService {
         fcmTokenRepository.save(fcmToken);
     }
 
+    @Transactional
     public void unregisterToken(String token) {
         fcmTokenRepository.deleteByToken(token);
     }

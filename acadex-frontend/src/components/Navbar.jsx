@@ -12,9 +12,10 @@ import {
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { getProfile } from "../services/userService";
-import { deleteToken } from "firebase/messaging";
+import { deleteToken, getToken  } from "firebase/messaging";
 import { getFirebaseMessaging } from "../firebase/firebase";
 import { unregisterFcmToken } from "../services/firebaseNotificationService";
+import { getServiceWorkerRegistration } from "../firebase/firebase";
 
 export default function Navbar() {
   const { isLoggedIn, logoutUser } = useAuth();
@@ -43,24 +44,31 @@ export default function Navbar() {
   };
 
   const handleLogout = async () => {
-    try {
-      const messaging = await getFirebaseMessaging();
+  try {
+    const messaging = await getFirebaseMessaging();
 
-      if (messaging) {
-        const token = await deleteToken(messaging);
+    if (messaging) {
 
-        if (token) {
-          await unregisterFcmToken(token);
-        }
+      const registration = getServiceWorkerRegistration();
+
+      const token = await getToken(messaging, {
+        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+        serviceWorkerRegistration: registration,
+      });
+
+      if (token) {
+        await unregisterFcmToken(token);
       }
-    } catch (e) {
-      console.error(e);
+
+      await deleteToken(messaging);
     }
+  } catch (e) {
+    console.error(e);
+  }
 
-    logoutUser();
-
-    navigate("/login");
-  };
+  logoutUser();
+  navigate("/login");
+};
 
   const navClass = ({ isActive }) =>
     `relative px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
