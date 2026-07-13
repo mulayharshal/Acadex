@@ -8,6 +8,8 @@ import com.acadex.config.FileStorageService;
 import com.acadex.dto.UpdateNoteDto;
 import com.acadex.model.*;
 import com.acadex.dto.noteDto;
+import com.acadex.notification.FcmTokenRepository;
+import com.acadex.notification.NotificationService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +42,12 @@ public class NoteService {
 
     @Autowired
     EmailService emailService;
+
+    @Autowired
+    NotificationService notificationService;
+
+    @Autowired
+    private FcmTokenRepository  fcmTokenRepository;
 
 
 //    adding new notes
@@ -86,6 +94,12 @@ public class NoteService {
             note.setUploadedBy(user);
 
             noteRepository.save(note);
+
+            List<FcmToken> tokens=fcmTokenRepository.findAll();
+            for(FcmToken fcmToken:tokens){
+                notificationService.sendNotification(fcmToken.getToken(), "📚 New Note Uploaded ", note.getTitle()+" has been Uploaded. ");
+            }
+
             return ResponseEntity.ok(ApiResponse.success("Note uploaded successfully", note));
 
         } catch (Exception e) {
@@ -153,6 +167,13 @@ public class NoteService {
             noteLikeRepository.save(noteLike);
             note.setLikeCount(note.getLikeCount()+1);
             noteRepository.save(note);
+
+            User noteOwner=note.getUploadedBy();
+            List<FcmToken> fcmTokens=fcmTokenRepository.findAllByUser(noteOwner);
+            for(FcmToken fcmToken:fcmTokens){
+                notificationService.sendNotification(fcmToken.getToken(),"❤\uFE0F Someone liked your note",user.getName() +" liked your note \" "+note.getTitle()+"\" ");
+            }
+
             return ResponseEntity.ok(ApiResponse.success("like added",note));
         }
     }
@@ -178,6 +199,14 @@ public class NoteService {
             noteSaveRepository.save(noteSave);
             note.setSaveCount(note.getSaveCount()+1);
             noteRepository.save(note);
+
+            User noteOwner=note.getUploadedBy();
+            List<FcmToken> fcmTokens=fcmTokenRepository.findAllByUser(noteOwner);
+            for (FcmToken fcmToken:fcmTokens){
+
+                notificationService.sendNotification(fcmToken.getToken(),"\uD83D\uDD16 Your note was saved",user.getName() +" saved your note  \" "+note.getTitle()+"\" ");
+            }
+
             return ResponseEntity.ok(ApiResponse.success("note saved",note));
         }
     }
@@ -196,6 +225,12 @@ public class NoteService {
         newComment.setUser(user);
         newComment.setComment(comment);
         noteCommentRepository.save(newComment);
+
+        User noteOwner=note.getUploadedBy();
+        List<FcmToken> fcmTokens=fcmTokenRepository.findAllByUser(noteOwner);
+        for(FcmToken fcmToken:fcmTokens){
+            notificationService.sendNotification(fcmToken.getToken(),"\uD83D\uDCAC New comment on your note",user.getName()+" commented on your note \" "+note.getTitle()+"\" ");
+        }
         return ResponseEntity.ok(ApiResponse.success("Commented Successfully",newComment));
     }
 

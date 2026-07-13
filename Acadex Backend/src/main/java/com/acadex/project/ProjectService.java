@@ -8,6 +8,8 @@ import com.acadex.config.FileStorageService;
 import com.acadex.dto.UpdateProjectDto;
 import com.acadex.model.*;
 import com.acadex.dto.ProjectDto;
+import com.acadex.notification.FcmTokenRepository;
+import com.acadex.notification.NotificationService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +45,12 @@ public class ProjectService {
 
     @Autowired
     EmailService emailService;
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private FcmTokenRepository fcmTokenRepository;
 
 //    upload the projects
     public ResponseEntity<ApiResponse<?>> uploadProject(ProjectDto projectDto){
@@ -143,6 +151,13 @@ public class ProjectService {
             ProjectLike savedLike=projectLikeRepository.save(projectLike);
             project.setLikeCount(project.getLikeCount()+1);
             projectRepository.save(project);
+
+            User projectOwner=project.getUploadedBy();
+            List<FcmToken> fcmTokens=fcmTokenRepository.findAllByUser(projectOwner);
+            for(FcmToken fcmToken:fcmTokens){
+                notificationService.sendNotification(fcmToken.getToken(),"❤\uFE0F Someone liked your project",user.getName() +" liked your project \" "+project.getTitle()+"\" ");
+            }
+
             return ResponseEntity.ok(ApiResponse.success("Project liked success",project));
         }
     }
@@ -168,6 +183,12 @@ public class ProjectService {
             ProjectSave saved=projectSaveRepository.save(projectSave);
             project.setSaveCount(project.getSaveCount()+1);
             projectRepository.save(project);
+
+            User projectOwner=project.getUploadedBy();
+            List<FcmToken> fcmTokens=fcmTokenRepository.findAllByUser(projectOwner);
+            for(FcmToken fcmToken:fcmTokens){
+                notificationService.sendNotification(fcmToken.getToken(),"\uD83D\uDD16 Your project was saved",user.getName() +" saved your project \" "+project.getTitle()+"\" ");
+            }
             return ResponseEntity.ok(ApiResponse.success("Project saved successfully",project));
         }
     }
@@ -186,6 +207,12 @@ public class ProjectService {
         projectComment.setComment(comment);
         projectComment.setUser(user);
         projectCommentRepository.save(projectComment);
+
+        User projectOwner=project.getUploadedBy();
+        List<FcmToken> fcmTokens=fcmTokenRepository.findAllByUser(projectOwner);
+        for(FcmToken fcmToken:fcmTokens){
+            notificationService.sendNotification(fcmToken.getToken(),"\uD83D\uDCAC New comment on your project",user.getName() +" commented on your project  \" "+project.getTitle()+"\" ");
+        }
         return ResponseEntity.ok(ApiResponse.success("Project commented successfully",projectComment));
     }
 

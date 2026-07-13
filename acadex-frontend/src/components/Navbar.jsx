@@ -12,6 +12,9 @@ import {
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { getProfile } from "../services/userService";
+import { deleteToken } from "firebase/messaging";
+import { getFirebaseMessaging } from "../firebase/firebase";
+import { unregisterFcmToken } from "../services/firebaseNotificationService";
 
 export default function Navbar() {
   const { isLoggedIn, logoutUser } = useAuth();
@@ -39,8 +42,23 @@ export default function Navbar() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      const messaging = await getFirebaseMessaging();
+
+      if (messaging) {
+        const token = await deleteToken(messaging);
+
+        if (token) {
+          await unregisterFcmToken(token);
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
     logoutUser();
+
     navigate("/login");
   };
 

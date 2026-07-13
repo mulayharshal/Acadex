@@ -5,6 +5,8 @@ import { Mail, Lock, ArrowRight } from "lucide-react";
 
 import { login } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
+import { requestNotificationPermission } from "../firebase/messaging";
+import { registerFcmToken } from "../services/firebaseNotificationService";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -41,6 +43,18 @@ export default function Login() {
 
       if (res.success) {
         loginUser(res.data);
+
+        try {
+          const token = await requestNotificationPermission();
+
+          if (token) {
+            await registerFcmToken(token);
+
+            console.log("FCM Token Registered Successfully");
+          }
+        } catch (err) {
+          console.error(err);
+        }
 
         navigate("/");
       } else {
