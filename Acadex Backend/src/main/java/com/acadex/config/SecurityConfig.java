@@ -44,7 +44,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173","https://acadex-harshal.web.app", "https://acadex-harshal.firebaseapp.com", "https://gentle-cliff-03cfe7100.7.azurestaticapps.net"));
+        config.setAllowedOrigins(List.of("http://localhost:5173","https://acadex-harshal.web.app", "https://acadex-harshal.firebaseapp.com", "https://gentle-cliff-03cfe7100.7.azurestaticapps.net","https://acadex-web.netlify.app"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
