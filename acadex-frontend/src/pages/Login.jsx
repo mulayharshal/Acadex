@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 
@@ -10,8 +10,12 @@ import { registerFcmToken } from "../services/firebaseNotificationService";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { loginUser } = useAuth();
+
+  // Check if we were redirected here due to session expiry
+  const sessionExpired = location.state?.sessionExpired;
 
   const [loading, setLoading] = useState(false);
 
@@ -56,7 +60,7 @@ export default function Login() {
           console.error(err);
         }
 
-        navigate("/");
+        navigate(location.state?.from?.pathname || "/");
       } else {
         if (res.message === "Email is not verified. OTP resent to your email") {
           navigate("/verify-otp", {
@@ -93,6 +97,13 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
+          {/* Session expired banner */}
+          {sessionExpired && (
+            <div className="rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 text-sm font-medium">
+              ⏰ Your session has expired. Please login again.
+            </div>
+          )}
+
           {error && (
             <div className="rounded-2xl bg-red-50 border border-red-200 text-red-600 px-4 py-3">
               {error}

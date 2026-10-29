@@ -26,21 +26,22 @@ api.interceptors.response.use(
 
   (error) => {
 
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+
+    if (status === 401 || status === 403) {
 
       const token = localStorage.getItem("token");
 
-      // Only logout if the user was actually logged in
+      // Only trigger logout if the user was actually logged in with a token
       if (token) {
 
+        // Clear localStorage immediately so ProtectedRoute won't allow re-entry
         localStorage.removeItem("token");
-
-        // Remove any other stored user data if present
         localStorage.removeItem("user");
 
-        alert("Your session has expired. Please login again.");
-
-        window.location.replace("/login");
+        // Dispatch a custom event so AuthContext can update React state
+        // and navigate to /login cleanly without a full page reload
+        window.dispatchEvent(new CustomEvent("auth:token-expired"));
 
       }
 

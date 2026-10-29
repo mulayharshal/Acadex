@@ -11,7 +11,9 @@ import {
   FileText,
   Image as ImageIcon,
   Trash2,
+  Share2,
 } from "lucide-react";
+import ShareModal from "../components/ShareModal";
 import { motion } from "framer-motion";
 
 import {
@@ -39,6 +41,7 @@ const [pageWidth, setPageWidth] = useState(900);
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(true);
+  const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
     loadNote();
@@ -197,7 +200,7 @@ const [pageWidth, setPageWidth] = useState(900);
 
               <span>{note.uploadedBy?.name}</span>
             </div>
-            <div className="grid md:grid-cols-4 gap-4 mt-10">
+            <div className="grid md:grid-cols-5 gap-4 mt-10">
               <button
                 onClick={handleLike}
                 className={`rounded-2xl py-4 flex justify-center items-center gap-2 transition-all duration-300 ${
@@ -239,6 +242,14 @@ const [pageWidth, setPageWidth] = useState(900);
                 <Download size={18} />
                 Download
               </a>
+
+              <button
+                onClick={() => setShareOpen(true)}
+                className="rounded-2xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 py-4 flex justify-center items-center gap-2 transition-all duration-300"
+              >
+                <Share2 size={18} />
+                Share
+              </button>
             </div>
 
             {/* Preview */}
@@ -406,6 +417,12 @@ const [pageWidth, setPageWidth] = useState(900);
           </div>
         </div>
       </div>
+
+      <ShareModal
+        isOpen={shareOpen}
+        onClose={() => setShareOpen(false)}
+        title={note?.title}
+      />
     </motion.div>
   );
 }

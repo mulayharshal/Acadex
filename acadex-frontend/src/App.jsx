@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
@@ -22,7 +22,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <BrowserRouter>
+    <>
       <Navbar />
       <Routes>
         <Route
@@ -157,7 +157,7 @@ function App() {
         <Route path="/verify-otp" element={<VerifyOtp />} />
         
       </Routes>
-    </BrowserRouter>
+    </>
   );
 }
 
