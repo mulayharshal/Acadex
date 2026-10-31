@@ -16,6 +16,8 @@ import EditProject from "./pages/EditProject";
 import SavedNotes from "./pages/SavedNotes";
 import SavedProjects from "./pages/SavedProjects";
 import VerifyOtp from "./pages/VerifyOtp";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Notes from "./pages/Notes";
 import Projects from "./pages/Projects";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -155,6 +157,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         
       </Routes>
     </>

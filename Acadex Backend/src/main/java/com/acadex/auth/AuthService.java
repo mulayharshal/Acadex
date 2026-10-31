@@ -145,7 +145,7 @@ public class AuthService {
         }
         user.setPassword(passwordEncoder.encode(newPassword));
         authRepository.save(user);
-        emailService.sendPasswordReset(email, user.getName());
+        emailService.sendPasswordResetSuccess(email, user.getName());
         return ResponseEntity.ok(ApiResponse.success("Password reset successfully", "Please login with new password"));
     }
 
